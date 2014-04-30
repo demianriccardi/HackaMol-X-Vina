@@ -92,7 +92,7 @@
     $input   .= "out       = "    . $self->out_fn->stringify . "\n"    if $self->has_out_fn;
     $input   .= "cpu       = "    . $self->cpu               . "\n"    if $self->has_cpu;
     $input   .= "num_modes = "    . $self->num_modes         . "\n"    if $self->has_num_modes;
-    $input   .= "log       = "    . $self->log_fn->stringify    . "\n" if $self->has_log_fn;
+    $input   .= "log       = "    . $self->log_fn->stringify . "\n"    if $self->has_log_fn;
     foreach my $cond (qw(receptor ligand cpu num_modes energy_range exhaustiveness seed)) {
       my $condition = "has_$cond";
       $input .= "$cond = ". $self->$cond . "\n" if $self->$condition;
