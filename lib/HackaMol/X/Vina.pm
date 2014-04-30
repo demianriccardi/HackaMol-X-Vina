@@ -1,16 +1,13 @@
   package HackaMol::X::Vina;
   #ABSTRACT: HackaMol extension for running Autodock Vina  
   use Moose;
+  use MooseX::StrictConstructor;
   use Moose::Util::TypeConstraints;
-  use Carp;
+  use Math::Vector::Real;
   use namespace::autoclean;
- 
-  with qw(HackaMol::ExeRole HackaMol::PathRole);
+  use Carp;
 
-  has 'mol' => (
-    is  => 'ro',
-    isa => 'HackaMol::Molecule',
-  );
+  with qw(HackaMol::X::ExtensionRole);
 
   has 'receptor'  => (is => 'ro', isa => 'Str', predicate => 'has_receptor');
   has 'ligand'    => (is => 'ro', isa => 'Str', predicate => 'has_ligand');
@@ -18,12 +15,17 @@
   has 'num_modes' => (is => 'ro', isa => 'Int', predicate => 'has_num_modes');
 
   has $_ => (
-      is => 'ro', isa => 'Num', predicate => "has_$_",
-  ) foreach qw(center_x center_y center_z);
+      is => 'rw', isa => 'Num', predicate => "has_$_",
+  ) foreach qw(center_x center_y center_z size_x size_y size_z);
+
+  has $_ => (
+      is => 'ro', isa => 'Math::Vector::Real', predicate => "has_$_",
+  ) foreach qw(center size);
 
   has $_ => (
     is => 'ro', isa => 'Int', predicate => "has_$_",
-  ) foreach qw(energy_range exhaustiveness);
+  ) foreach qw(energy_range exhaustiveness seed);
+
 
   sub BUILD {
     my $self = shift;
@@ -31,33 +33,67 @@
     if ( $self->has_scratch ) {
         $self->scratch->mkpath unless ( $self->scratch->exists );
     }
-    $self->exe("~/bin/vina") unless $self->has_exe;
 
+#  setting center via MVR overrides whatever is set via center_x etc.
+    if ($self->has_center){
+      my ($x,$y,$z) = @{$self->center};
+      $self->center_x($x);  
+      $self->center_y($y);  
+      $self->center_z($z);  
+    }
+
+    if ($self->has_size){
+      my ($x,$y,$z) = @{$self->size};
+      $self->size_x($x); 
+      $self->size_y($y);
+      $self->size_z($z);
+    }
+    
+    unless ( $self->has_command ) {
+        return unless ( $self->has_exe );
+        my $cmd = $self->build_command;
+        $self->command($cmd);
+    }
     return;
   }
 
+  #required methods
   sub build_command {
     my $self = shift;
     my $cmd;
     $cmd  = $self->exe;
-    $cmd .= " " . $self->in_fn->stringify    if $self->has_in_fn;
-    $cmd .= " " . $self->exe_endops          if $self->has_exe_endops;
-    $cmd .= " > " . $self->out_fn->stringify if $self->has_out_fn;
-
-    # no cat of out_fn because of options to run without writing, etc
+    $cmd .= " --config " . $self->in_fn->stringify  if $self->has_in_fn;
+    # we always capture output 
     return $cmd;
-}
+  }
+
+  sub _build_map_in{
+    
+    my $sub_cr = sub { 
+                      my $self = shift;
+                      $self->write_input;
+                     };
+    return $sub_cr;
+  }
+
+  sub _build_map_out{
+    my $sub_cr = sub { return (@_) };
+    return $sub_cr;
+  }
 
   sub write_input {
     my $self  = shift;
-    local $CWD = $self->scratch if ( $self->has_scratch );
+
+    unless ($self->has_in_fn) {
+      croak "no vina in_fn for writing input";
+    }
 
     my $input ;
-    $input   .= "out       = "    . $self->out_fn->stringify . "\n" if $self->has_out;
-    $input   .= "cpu       = "    . $self->cpu               . "\n" if $self->has_cpu;
-    $input   .= "num_modes = "    . $self->num_modes         . "\n" if $self->has_num_modes;
-    $input   .= "log       = "    . $self->err->stringify    . "\n" if $self->has_err;
-    foreach my $cond (qw(receptor ligand cpu num_modes energy_range exhaustiveness)) {
+    $input   .= "out       = "    . $self->out_fn->stringify . "\n"    if $self->has_out_fn;
+    $input   .= "cpu       = "    . $self->cpu               . "\n"    if $self->has_cpu;
+    $input   .= "num_modes = "    . $self->num_modes         . "\n"    if $self->has_num_modes;
+    $input   .= "log       = "    . $self->log_fn->stringify    . "\n" if $self->has_log_fn;
+    foreach my $cond (qw(receptor ligand cpu num_modes energy_range exhaustiveness seed)) {
       my $condition = "has_$cond";
       $input .= "$cond = ". $self->$cond . "\n" if $self->$condition;
     }

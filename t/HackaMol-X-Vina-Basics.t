@@ -7,20 +7,19 @@ use Test::More;
 use Test::Fatal qw(lives_ok dies_ok);
 use Test::Dir;
 use Test::Warn;
-use HackaMol::X::Calculator;
+use HackaMol::X::Vina;
 use HackaMol;
 use Math::Vector::Real;
 use File::chdir;
 use Cwd;
 
 BEGIN {
-    use_ok('HackaMol::X::Calculator');
+    use_ok('HackaMol::X::Vina');
 }
 
 my $cwd = getcwd;
 
 # coderef
-my $sub_cr = sub { return (@_) };
 
 {    # test HackaMol class attributes and methods
 
@@ -29,9 +28,9 @@ my $sub_cr = sub { return (@_) };
 
     my @roles = qw(HackaMol::ExeRole HackaMol::PathRole);
 
-    map has_attribute_ok( 'HackaMol::X::Calculator', $_ ), @attributes;
-    map can_ok( 'HackaMol::X::Calculator', $_ ), @methods;
-    map does_ok( 'HackaMol::X::Calculator', $_ ), @roles;
+    map has_attribute_ok( 'HackaMol::X::Vina', $_ ), @attributes;
+    map can_ok( 'HackaMol::X::Vina', $_ ), @methods;
+    map does_ok( 'HackaMol::X::Vina', $_ ), @roles;
 
 }
 
@@ -41,32 +40,40 @@ my $obj;
 {    # test basic functionality
 
     lives_ok {
-        $obj = HackaMol::X::Calculator->new();
+        $obj = HackaMol::X::Vina->new(  
+                                      center => V(0,1,2),
+                                      size   => V(10,11,12),
+                                     );
     }
     'creation without required mol lives';
+    
+    is ($obj->center_x, 0, "center_x");
+    is ($obj->center_y, 1, "center_y");
+    is ($obj->center_z, 2, "center_z");
+    is ($obj->size_x, 10, "size_x");
+    is ($obj->size_y, 11, "size_y");
+    is ($obj->size_z, 12, "size_z");
 
     lives_ok {
-        $obj = HackaMol::X::Calculator->new( mol => $mol );
+        $obj = HackaMol::X::Vina->new( mol => $mol );
     }
     'creation of an obj with mol';
 
     dir_not_exists_ok( "t/tmp", 'scratch directory does not exist yet' );
 
     lives_ok {
-        $obj = HackaMol::X::Calculator->new( mol => $mol, exe => "foo.exe" );
+        $obj = HackaMol::X::Vina->new( mol => $mol, exe => "vina" );
     }
     'creation of an obj with exe';
 
     dir_not_exists_ok( "t/tmp", 'scratch directory does not exist yet' );
 
-    is( $obj->command, $obj->exe, "command set to exe" );
+    is( $obj->command, $obj->exe , "command set to exe" );
 
     lives_ok {
-        $obj = HackaMol::X::Calculator->new(
+        $obj = HackaMol::X::Vina->new(
             mol     => $mol,
-            exe     => "foo.exe <",
-            map_in  => $sub_cr,
-            map_out => $sub_cr,
+            exe     => "vina",
             in_fn   => "foo.inp",
             scratch => "t/tmp"
         );
@@ -76,21 +83,18 @@ my $obj;
     dir_exists_ok( $obj->scratch, 'scratch directory exists' );
     is(
         $obj->command,
-        $obj->exe . " " . $obj->in_fn,
+        $obj->exe . " --config " . $obj->in_fn,
         "command set to exe and input"
     );
     is( $obj->scratch, "$cwd/t/tmp", "scratch directory" );
 
     lives_ok {
-        $obj = HackaMol::X::Calculator->new(
+        $obj = HackaMol::X::Vina->new(
             mol        => $mol,
-            exe        => "foo.exe <",
-            map_in     => $sub_cr,
-            map_out    => $sub_cr,
+            exe        => "vina",
             in_fn      => "foo.inp",
             scratch    => "t/tmp",
             command    => "nonsense",
-            exe_endops => "tackon",
         );
     }
     'test building of an obj with exisiting scratch  and command attr';
@@ -100,7 +104,7 @@ my $obj;
     $obj->command( $obj->build_command );
     is(
         $obj->command,
-        $obj->exe . " " . $obj->in_fn . " " . $obj->exe_endops,
+        $obj->exe . " --config " . $obj->in_fn ,
         "command reset"
     );
 
@@ -108,11 +112,9 @@ my $obj;
     dir_not_exists_ok( "t/tmp", 'scratch directory deleted' );
 
     lives_ok {
-        $obj = HackaMol::X::Calculator->new(
+        $obj = HackaMol::X::Vina->new(
             mol        => $mol,
-            exe        => "foo.exe <",
-            map_in     => $sub_cr,
-            map_out    => $sub_cr,
+            exe        => "vina",
             in_fn      => "foo.inp",
             scratch    => "t/tmp",
             out_fn     => "foo.out",
@@ -125,11 +127,9 @@ my $obj;
     $obj->command( $obj->build_command );
     is(
         $obj->command,
-        $obj->exe . " "
-          . $obj->in_fn->stringify . " "
-          . $obj->exe_endops . " > "
-          . $obj->out_fn->stringify,
-        "big command with redirect to output"
+        $obj->exe . " --config "
+          . $obj->in_fn->stringify,
+        "big command ignores redirect to output"
     );
 
     $obj->scratch->remove_tree;
@@ -139,15 +139,15 @@ my $obj;
 
 {    # test the map_in and map_out
 
-    $obj = HackaMol::X::Calculator->new(
+    $obj = HackaMol::X::Vina->new(
         mol     => $mol,
         in_fn   => "foo.inp",
-        map_in  => $sub_cr,
-        map_out => $sub_cr,
+        center  => V(0,1,2),
+        size    => V(10,11,12),
     );
 
     my @tv          = qw(1 2 3 4);
-    my @def_map_in  = &{ $obj->map_in }(@tv);
+    my @def_map_in  = &{ $obj->map_in }($obj);
     my @def_map_out = &{ $obj->map_out }(@tv);
 
     is_deeply( \@tv, \@def_map_in, 'default map_in returns what you send in' );
