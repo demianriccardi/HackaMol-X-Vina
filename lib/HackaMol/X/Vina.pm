@@ -4,6 +4,8 @@
   use MooseX::StrictConstructor;
   use Moose::Util::TypeConstraints;
   use Math::Vector::Real;
+  #use MooseX::Types;
+  #use MooseX::Types::Stringlike qw/Stringlike/;
   use namespace::autoclean;
   use Carp;
 
