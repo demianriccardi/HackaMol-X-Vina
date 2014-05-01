@@ -16,15 +16,15 @@ SYNOPSIS
        use Math::Vector::Real;
        
        my $receptor = "receptor.pdbqt";
-       my $rmol     = HackaMol -> new( hush_read=>1 ) -> read_file_mol($receptor); 
+       my $rmol     = HackaMol -> new( hush_read=>1 ) -> read_file_mol( $receptor ); 
      
-       my @centers = map  {$_->xyz}
-                     grep {$_->name    eq "OH" }
-                     grep {$_->resname eq "TYR"} $rmol->all_atoms;
+       my @centers = map  {$_ -> xyz}
+                     grep {$_ -> name    eq "OH" }
+                     grep {$_ -> resname eq "TYR"} $rmol -> all_atoms;
      
-       foreach my $center (@centers){
+       foreach my $center ( @centers ){
      
-           my $vina = HackaMol::X::Vina->new(
+           my $vina = HackaMol::X::Vina -> new(
                receptor       => $receptor,
                ligand         => "ligand.pdbt",
                in_fn          => "conf.txt",
@@ -38,8 +38,8 @@ SYNOPSIS
                scratch        => 'tmp',
            );
            
-           $vina->map_input;
-           my @bes = $vina->map_output;
+           $vina -> map_input;
+           my @bes = $vina -> map_output;
      
        }
 
