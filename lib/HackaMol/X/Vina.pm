@@ -11,8 +11,8 @@
 
   with qw(HackaMol::X::ExtensionRole);
 
-  has 'receptor'  => (is => 'ro', isa => 'Str', predicate => 'has_receptor');
-  has 'ligand'    => (is => 'ro', isa => 'Str', predicate => 'has_ligand');
+  has 'receptor'  => (is => 'rw', isa => 'Str', predicate => 'has_receptor');
+  has 'ligand'    => (is => 'rw', isa => 'Str', predicate => 'has_ligand');
 
   has $_ => (
       is => 'rw', isa => 'Num', predicate => "has_$_",
@@ -131,6 +131,37 @@
 __END__
 
 =head1 SYNOPSIS
+    use HackaMol;
+    use HackaMol::X::Vina;
+    use Math::Vector::Real;
+    
+    my $receptor = "receptor.pdbqt";
+    my $rmol     = HackaMol -> new( hush_read=>1 ) -> read_file_mol($receptor); 
 
-  
+    my @centers = map  {$_->xyz}
+                  grep {$_->name    eq "OH" }
+                  grep {$_->resname eq "TYR"} $rmol->all_atoms;
+
+    foreach my $center (@centers){
+
+        my $vina = HackaMol::X::Vina->new(
+            receptor       => $receptor,
+            ligand         => "ligand.pdbt",
+            in_fn          => "conf.txt",
+            out_fn         => "ligand_out.pdbqt",
+            center         => $center,
+            size           => V( 20, 20, 20 ),
+            cpu            => 4,
+            num_modes      => 1,
+            exhaustiveness => 12,
+            exe            => '~/bin/vina',
+            scratch        => 'tmp',
+        );
+        
+        $vina->map_input;
+        my @bes = $vina->map_output;
+
+    }
+
+
 
