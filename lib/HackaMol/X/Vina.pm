@@ -68,12 +68,7 @@
   }
 
   sub _build_map_in{
-    
-    my $sub_cr = sub { 
-                      my $self = shift;
-                      $self->write_input;
-                     };
-    return $sub_cr;
+    return sub { return ( shift->write_input ) };
   }
 
   sub _build_map_out{
@@ -89,20 +84,17 @@
     }
 
     my $input ;
-    $input   .= "out       = "    . $self->out_fn->stringify . "\n"    if $self->has_out_fn;
-    $input   .= "cpu       = "    . $self->cpu               . "\n"    if $self->has_cpu;
-    $input   .= "num_modes = "    . $self->num_modes         . "\n"    if $self->has_num_modes;
-    $input   .= "log       = "    . $self->log_fn->stringify . "\n"    if $self->has_log_fn;
+    $input   .= sprintf("%-15s = %-55s\n",'out', $self->out_fn->stringify) if $self->has_out_fn;
+    $input   .= sprintf("%-15s = %-55s\n",'log', $self->log_fn->stringify) if $self->has_log_fn;
     foreach my $cond (qw(receptor ligand cpu num_modes energy_range exhaustiveness seed)) {
       my $condition = "has_$cond";
-      $input .= "$cond = ". $self->$cond . "\n" if $self->$condition;
+      $input .= sprintf("%-15s = %-55s\n",$cond , $self->$cond) if $self->$condition;
     }
     foreach my $metric (qw(center_x center_y center_z size_x size_y size_z)) {
-      $input .= "$metric = ". $self->$metric . "\n";
+      $input .= sprintf("%-15s = %-55s\n",$metric , $self->$metric);
     }
-  
     $self->in_fn->spew($input);
-      
+    return ($input); 
   }
 
   __PACKAGE__->meta->make_immutable;

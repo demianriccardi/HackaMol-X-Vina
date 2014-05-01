@@ -140,19 +140,25 @@ my $obj;
 {    # test the map_in and map_out
 
     $obj = HackaMol::X::Vina->new(
-        mol     => $mol,
-        in_fn   => "foo.inp",
-        center  => V(0,1,2),
-        size    => V(10,11,12),
+        mol            => $mol,
+        in_fn          => "foo.inp",
+        center         => V(0,1,2),
+        size           => V(20,20,20),
+        cpu            => 4,
+        num_modes      => 1,
+        exhaustiveness => 12,
+        exe            => '~/bin/vina', 
+        scratch        => 't/tmp',
+        homedir        => '.',
     );
 
-    my @tv          = qw(1 2 3 4);
-    my @def_map_in  = &{ $obj->map_in }($obj);
-    my @def_map_out = &{ $obj->map_out }(@tv);
-
-    is_deeply( \@tv, \@def_map_in, 'default map_in returns what you send in' );
-    is_deeply( \@tv, \@def_map_out,
-        'default map_out returns what you send in' );
+    my $input = $obj->map_input ;
+    $CWD = $obj->scratch;    
+    my $input2 = $obj->in_fn->slurp;
+    is( $input, $input2, "input written to scratch is that returned by map_input" );
+    $CWD = $obj->homedir;    
+    $obj->scratch->remove_tree;
+    dir_not_exists_ok( "t/tmp", 'scratch directory deleted' );
 
 }
 
