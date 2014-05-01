@@ -164,4 +164,17 @@ __END__
     }
 
 
+=head1 DESCRIPTION
+
+HackaMol::X::Vina provides an interface to AutoDock Vina. This class does not include the AutoDock Vina program, which is 
+<released nder a very permissive Apache license|http://vina.scripps.edu/manual.html#license>, with few restrictions on 
+commercial or non-commercial use, or on the derivative works, such is this. Follow these 
+<instructions | http://vina.scripps.edu/manual.html#installation> to acquire the program. Most importantly, if you use this 
+interface effectively, please be sure to cite AutoDock Vina in your work:
+
+O. Trott, A. J. Olson, AutoDock Vina: improving the speed and accuracy of docking with a new scoring function, efficient optimization and multithreading, Journal of Computational Chemistry 31 (2010) 455-461 
+
+Since HackaMol has no pdbqt writing capabilities (yet, HackaMol can read pdbqt files), the user is required to provide those 
+files. This is still a work in progress and the API may still change. 
+
 
