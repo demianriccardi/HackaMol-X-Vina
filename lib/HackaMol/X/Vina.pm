@@ -11,8 +11,6 @@
 
   has 'receptor'  => (is => 'ro', isa => 'Str', predicate => 'has_receptor');
   has 'ligand'    => (is => 'ro', isa => 'Str', predicate => 'has_ligand');
-  has 'cpu'       => (is => 'ro', isa => 'Int', predicate => 'has_cpu');
-  has 'num_modes' => (is => 'ro', isa => 'Int', predicate => 'has_num_modes');
 
   has $_ => (
       is => 'rw', isa => 'Num', predicate => "has_$_",
@@ -24,7 +22,7 @@
 
   has $_ => (
     is => 'ro', isa => 'Int', predicate => "has_$_",
-  ) foreach qw(energy_range exhaustiveness seed);
+  ) foreach qw(energy_range exhaustiveness seed cpu num_modes);
 
 
   sub BUILD {

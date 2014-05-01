@@ -33,7 +33,9 @@ my $obj = HackaMol::X::Vina->new(
         exhaustiveness => 8,
         exe            => '~/bin/vina',
         scratch        => 't/tmp',
+        seed           => 314159,
     );
+
 my $input = $obj->map_input;
 print $input;
 
