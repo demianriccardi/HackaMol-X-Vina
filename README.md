@@ -26,7 +26,7 @@ SYNOPSIS
      
            my $vina = HackaMol::X::Vina -> new(
                receptor       => $receptor,
-               ligand         => "ligand.pdbt",
+               ligand         => "ligand.pdbtq",
                in_fn          => "conf.txt",
                out_fn         => "ligand_out.pdbqt",
                center         => $center,
