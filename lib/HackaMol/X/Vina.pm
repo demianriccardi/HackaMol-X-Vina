@@ -23,7 +23,7 @@ has $_ => (
 ) foreach qw(center_x center_y center_z size_x size_y size_z);
 
 has $_ => (
-    is        => 'ro',
+    is        => 'rw',
     isa       => 'Int',
     predicate => "has_$_",
 ) foreach qw(energy_range exhaustiveness seed cpu num_modes);
@@ -97,6 +97,14 @@ sub _build_map_out {
         return (@be);
     };
     return $sub_cr;
+}
+sub dock {
+  # want this to return configurations of the molecule
+  my $self      = shift;
+  my $num_modes = shift || 1;
+  $self->num_modes($num_modes);
+  $self->map_input; 
+  $self->map_output; 
 }
 
 sub write_input {
