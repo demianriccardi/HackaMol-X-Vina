@@ -40,19 +40,19 @@ my $obj;
 {    # test basic functionality
 
     lives_ok {
-        $obj = HackaMol::X::Vina->new(  
-                                      center => V(0,1,2),
-                                      size   => V(10,11,12),
-                                     );
+        $obj = HackaMol::X::Vina->new(
+            center => V( 0,  1,  2 ),
+            size   => V( 10, 11, 12 ),
+        );
     }
     'creation without required mol lives';
-    
-    is ($obj->center_x, 0, "center_x");
-    is ($obj->center_y, 1, "center_y");
-    is ($obj->center_z, 2, "center_z");
-    is ($obj->size_x, 10, "size_x");
-    is ($obj->size_y, 11, "size_y");
-    is ($obj->size_z, 12, "size_z");
+
+    is( $obj->center_x, 0,  "center_x" );
+    is( $obj->center_y, 1,  "center_y" );
+    is( $obj->center_z, 2,  "center_z" );
+    is( $obj->size_x,   10, "size_x" );
+    is( $obj->size_y,   11, "size_y" );
+    is( $obj->size_z,   12, "size_z" );
 
     lives_ok {
         $obj = HackaMol::X::Vina->new( mol => $mol );
@@ -68,7 +68,7 @@ my $obj;
 
     dir_not_exists_ok( "t/tmp", 'scratch directory does not exist yet' );
 
-    is( $obj->command, $obj->exe , "command set to exe" );
+    is( $obj->command, $obj->exe, "command set to exe" );
 
     lives_ok {
         $obj = HackaMol::X::Vina->new(
@@ -90,11 +90,11 @@ my $obj;
 
     lives_ok {
         $obj = HackaMol::X::Vina->new(
-            mol        => $mol,
-            exe        => "vina",
-            in_fn      => "foo.inp",
-            scratch    => "t/tmp",
-            command    => "nonsense",
+            mol     => $mol,
+            exe     => "vina",
+            in_fn   => "foo.inp",
+            scratch => "t/tmp",
+            command => "nonsense",
         );
     }
     'test building of an obj with exisiting scratch  and command attr';
@@ -102,11 +102,8 @@ my $obj;
     is( $obj->command, "nonsense",
         "command attr not overwritten during build" );
     $obj->command( $obj->build_command );
-    is(
-        $obj->command,
-        $obj->exe . " --config " . $obj->in_fn ,
-        "command reset"
-    );
+    is( $obj->command, $obj->exe . " --config " . $obj->in_fn,
+        "command reset" );
 
     $obj->scratch->remove_tree;
     dir_not_exists_ok( "t/tmp", 'scratch directory deleted' );
@@ -127,8 +124,7 @@ my $obj;
     $obj->command( $obj->build_command );
     is(
         $obj->command,
-        $obj->exe . " --config "
-          . $obj->in_fn->stringify,
+        $obj->exe . " --config " . $obj->in_fn->stringify,
         "big command ignores redirect to output"
     );
 
@@ -142,21 +138,22 @@ my $obj;
     $obj = HackaMol::X::Vina->new(
         mol            => $mol,
         in_fn          => "foo.inp",
-        center         => V(0,1,2),
-        size           => V(20,20,20),
+        center         => V( 0, 1, 2 ),
+        size           => V( 20, 20, 20 ),
         cpu            => 4,
         num_modes      => 1,
         exhaustiveness => 12,
-        exe            => '~/bin/vina', 
+        exe            => '~/bin/vina',
         scratch        => 't/tmp',
         homedir        => '.',
     );
 
-    my $input = $obj->map_input ;
-    $CWD = $obj->scratch;    
+    my $input = $obj->map_input;
+    $CWD = $obj->scratch;
     my $input2 = $obj->in_fn->slurp;
-    is( $input, $input2, "input written to scratch is that returned by map_input" );
-    $CWD = $obj->homedir;    
+    is( $input, $input2,
+        "input written to scratch is that returned by map_input" );
+    $CWD = $obj->homedir;
     $obj->scratch->remove_tree;
     dir_not_exists_ok( "t/tmp", 'scratch directory deleted' );
 

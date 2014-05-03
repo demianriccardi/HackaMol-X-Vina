@@ -1,38 +1,48 @@
-  package HackaMol::X::Vina;
-  #ABSTRACT: HackaMol extension for running Autodock Vina  
-  use Moose;
-  use MooseX::StrictConstructor;
-  use Moose::Util::TypeConstraints;
-  use Math::Vector::Real;
-  #use MooseX::Types;
-  #use MooseX::Types::Stringlike qw/Stringlike/;
-  use namespace::autoclean;
-  use Carp;
+package HackaMol::X::Vina;
 
-  with qw(HackaMol::X::ExtensionRole);
+#ABSTRACT: HackaMol extension for running Autodock Vina
+use Moose;
+use MooseX::StrictConstructor;
+use Moose::Util::TypeConstraints;
+use Math::Vector::Real;
 
-  has 'receptor'  => (is => 'rw', isa => 'Str', predicate => 'has_receptor');
-  has 'ligand'    => (is => 'rw', isa => 'Str', predicate => 'has_ligand');
+#use MooseX::Types;
+#use MooseX::Types::Stringlike qw/Stringlike/;
+use namespace::autoclean;
+use Carp;
 
-  has $_ => (
-      is => 'rw', isa => 'Num', predicate => "has_$_",
-  ) foreach qw(center_x center_y center_z size_x size_y size_z);
+with qw(HackaMol::X::ExtensionRole);
 
-  has $_ => (
-    is => 'ro', isa => 'Int', predicate => "has_$_",
-  ) foreach qw(energy_range exhaustiveness seed cpu num_modes);
+has 'receptor' => ( is => 'rw', isa => 'Str', predicate => 'has_receptor' );
+has 'ligand'   => ( is => 'rw', isa => 'Str', predicate => 'has_ligand' );
 
-  has 'center' => (
-      is => 'rw', isa => 'Math::Vector::Real', predicate => "has_center",
-      trigger => \&_set_center,
-  );
+has $_ => (
+    is        => 'rw',
+    isa       => 'Num',
+    predicate => "has_$_",
+) foreach qw(center_x center_y center_z size_x size_y size_z);
 
-  has 'size' => (
-      is => 'rw', isa => 'Math::Vector::Real', predicate => "has_size",
-      trigger => \&_set_size,
-  );
+has $_ => (
+    is        => 'ro',
+    isa       => 'Int',
+    predicate => "has_$_",
+) foreach qw(energy_range exhaustiveness seed cpu num_modes);
 
-  sub BUILD {
+has 'center' => (
+    is        => 'rw',
+    isa       => 'Math::Vector::Real',
+    predicate => "has_center",
+    trigger   => \&_set_center,
+);
+
+has 'size' => (
+    is        => 'rw',
+    isa       => 'Math::Vector::Real',
+    predicate => "has_size",
+    trigger   => \&_set_size,
+);
+
+sub BUILD {
     my $self = shift;
 
     if ( $self->has_scratch ) {
@@ -45,73 +55,79 @@
         $self->command($cmd);
     }
     return;
-  }
+}
 
-  sub _set_center {
-    my ($self,$center,$old_center) = @_;
-    $self->center_x($center->[0]);
-    $self->center_y($center->[1]);
-    $self->center_z($center->[2]);
-  }
+sub _set_center {
+    my ( $self, $center, $old_center ) = @_;
+    $self->center_x( $center->[0] );
+    $self->center_y( $center->[1] );
+    $self->center_z( $center->[2] );
+}
 
-  sub _set_size {
-    my ($self,$size,$old_size) = @_;
-    $self->size_x($size->[0]);
-    $self->size_y($size->[1]);
-    $self->size_z($size->[2]);
-  }
+sub _set_size {
+    my ( $self, $size, $old_size ) = @_;
+    $self->size_x( $size->[0] );
+    $self->size_y( $size->[1] );
+    $self->size_z( $size->[2] );
+}
 
-  #required methods
-  sub build_command {
+#required methods
+sub build_command {
     my $self = shift;
     my $cmd;
-    $cmd  = $self->exe;
-    $cmd .= " --config " . $self->in_fn->stringify  if $self->has_in_fn;
-    # we always capture output 
+    $cmd = $self->exe;
+    $cmd .= " --config " . $self->in_fn->stringify if $self->has_in_fn;
+
+    # we always capture output
     return $cmd;
-  }
+}
 
-  sub _build_map_in{
+sub _build_map_in {
     return sub { return ( shift->write_input ) };
-  }
+}
 
-  sub _build_map_out{
-    my $sub_cr = sub {     
-                      my $self = shift; 
-                      my $qr = qr/^\s+\d+\s+(-*\d+\.\d)/;
-                      my ($stdout,$sterr) = $self->capture_sys_command; 
-                      my @be = map { m/$qr/; $1 }
-                               grep{ m/$qr/ } 
-                               split ("\n",$stdout);  
-                      return (@be);
-                     };
+sub _build_map_out {
+    my $sub_cr = sub {
+        my $self = shift;
+        my $qr   = qr/^\s+\d+\s+(-*\d+\.\d)/;
+        my ( $stdout, $sterr ) = $self->capture_sys_command;
+        my @be = map { m/$qr/; $1 }
+          grep { m/$qr/ }
+          split( "\n", $stdout );
+        return (@be);
+    };
     return $sub_cr;
-  }
+}
 
-  sub write_input {
-    my $self  = shift;
+sub write_input {
+    my $self = shift;
 
-    unless ($self->has_in_fn) {
-      croak "no vina in_fn for writing input";
+    unless ( $self->has_in_fn ) {
+        croak "no vina in_fn for writing input";
     }
 
-    my $input ;
-    $input   .= sprintf("%-15s = %-55s\n",'out', $self->out_fn->stringify) if $self->has_out_fn;
-    $input   .= sprintf("%-15s = %-55s\n",'log', $self->log_fn->stringify) if $self->has_log_fn;
-    foreach my $cond (qw(receptor ligand cpu num_modes energy_range exhaustiveness seed)) {
-      my $condition = "has_$cond";
-      $input .= sprintf("%-15s = %-55s\n",$cond , $self->$cond) if $self->$condition;
+    my $input;
+    $input .= sprintf( "%-15s = %-55s\n", 'out', $self->out_fn->stringify )
+      if $self->has_out_fn;
+    $input .= sprintf( "%-15s = %-55s\n", 'log', $self->log_fn->stringify )
+      if $self->has_log_fn;
+    foreach my $cond (
+        qw(receptor ligand cpu num_modes energy_range exhaustiveness seed))
+    {
+        my $condition = "has_$cond";
+        $input .= sprintf( "%-15s = %-55s\n", $cond, $self->$cond )
+          if $self->$condition;
     }
     foreach my $metric (qw(center_x center_y center_z size_x size_y size_z)) {
-      $input .= sprintf("%-15s = %-55s\n",$metric , $self->$metric);
+        $input .= sprintf( "%-15s = %-55s\n", $metric, $self->$metric );
     }
     $self->in_fn->spew($input);
-    return ($input); 
-  }
+    return ($input);
+}
 
-  __PACKAGE__->meta->make_immutable;
+__PACKAGE__->meta->make_immutable;
 
-  1;
+1;
 
 __END__
 
