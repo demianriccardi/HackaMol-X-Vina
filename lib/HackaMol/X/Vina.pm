@@ -39,21 +39,6 @@
         $self->scratch->mkpath unless ( $self->scratch->exists );
     }
 
-#  setting center via MVR overrides whatever is set via center_x etc.
-#    if ($self->has_center){
-#      my ($x,$y,$z) = @{$self->center};
-#      $self->center_x($x);  
-#      $self->center_y($y);  
-#      $self->center_z($z);  
-#    }
-
-#    if ($self->has_size){
-#      my ($x,$y,$z) = @{$self->size};
-#      $self->size_x($x); 
-#      $self->size_y($y);
-#      $self->size_z($z);
-#    }
-    
     unless ( $self->has_command ) {
         return unless ( $self->has_exe );
         my $cmd = $self->build_command;
@@ -147,7 +132,7 @@ __END__
 
         my $vina = HackaMol::X::Vina->new(
             receptor       => $receptor,
-            ligand         => "ligand.pdbt",
+            ligand         => "ligand.pdbqt",
             in_fn          => "conf.txt",
             out_fn         => "ligand_out.pdbqt",
             center         => $center,
