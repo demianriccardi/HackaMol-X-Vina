@@ -5,6 +5,7 @@ use Moose;
 use MooseX::StrictConstructor;
 use Moose::Util::TypeConstraints;
 use Math::Vector::Real;
+use HackaMol; # for building molecules
 
 #use MooseX::Types;
 #use MooseX::Types::Stringlike qw/Stringlike/;
@@ -13,8 +14,12 @@ use Carp;
 
 with qw(HackaMol::X::ExtensionRole);
 
-has 'receptor' => ( is => 'rw', isa => 'Str', predicate => 'has_receptor' );
-has 'ligand'   => ( is => 'rw', isa => 'Str', predicate => 'has_ligand' );
+has $_ => ( 
+            is        => 'rw', 
+            isa       => 'Str', 
+            predicate => "has_$_",
+            required  => 1,
+          ) foreach ( qw( receptor ligand ) );
 
 has $_ => (
     is        => 'rw',
@@ -22,11 +27,20 @@ has $_ => (
     predicate => "has_$_",
 ) foreach qw(center_x center_y center_z size_x size_y size_z);
 
+has 'num_modes' => (
+    is        => 'rw',
+    isa       => 'Int',
+    predicate => "has_num_modes",
+    default   => 1,
+    lazy      => 1,
+);
+
 has $_ => (
     is        => 'rw',
     isa       => 'Int',
     predicate => "has_$_",
-) foreach qw(energy_range exhaustiveness seed cpu num_modes);
+) foreach qw(energy_range exhaustiveness seed cpu);
+
 
 has 'center' => (
     is        => 'rw',
@@ -49,11 +63,21 @@ sub BUILD {
         $self->scratch->mkpath unless ( $self->scratch->exists );
     }
 
+    # build in some defaults
+    $self->in_fn("conf.txt") unless ($self->has_in_fn);
+    $self->exe("~/bin/vina") unless $self->has_exe;
+
+    unless ( $self->has_out_fn ) {
+      my $outlig = $self->ligand;
+      $outlig =~ s/\.pdbqt/\_out\.pdbqt/;
+      $self->out_fn($outlig) unless ($self->has_out_fn); 
+    }
+
     unless ( $self->has_command ) {
-        return unless ( $self->has_exe );
         my $cmd = $self->build_command;
         $self->command($cmd);
     }
+
     return;
 }
 
@@ -104,7 +128,9 @@ sub dock {
   my $num_modes = shift || 1;
   $self->num_modes($num_modes);
   $self->map_input; 
-  $self->map_output; 
+  my @bes = $self->map_output; 
+  my $mol = HackaMol -> new(hush_read => 1)
+                     -> file_read_role($self->out_fn->stringify) if ($self->has_out_fn);
 }
 
 sub write_input {

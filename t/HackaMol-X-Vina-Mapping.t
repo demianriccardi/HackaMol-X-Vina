@@ -20,7 +20,7 @@ $ligout =~ s/\.pdbqt/_out\.pdbqt/;
 my $obj = HackaMol::X::Vina->new(
     receptor       => $receptor->absolute->stringify,
     ligand         => $lig1->absolute->stringify,
-    in_fn          => "conf.txt",
+    in_fn          => "config.txt",
     out_fn         => $ligout,
     center         => V( 6.865, 3.449, 85.230 ),
     size           => V( 10, 10, 10 ),
@@ -42,7 +42,7 @@ $obj->ligand( $lig2->absolute->stringify );
 $input = $obj->map_input;
 @bes   = $obj->map_output;
 
-is_deeply( scalar(@bes), 2, 'two binding energies computed with vina' );
+is_deeply( scalar(@bes), 2, 'two binding energies computed new ligand' );
 
 $obj->center( V( 18.073, -2.360, 90.288 ) );
 
@@ -57,11 +57,7 @@ my @centers = map { $_->xyz }
   grep { $_->resname eq "TYR" } $rmol->all_atoms;
 
 my $i = 0;
-my @be_expect;
-$be_expect[0] = [qw(-3.8 -3.6)];
-$be_expect[1] = [qw(-2.6 -2.5)];
-
-foreach my $cent (@centers) {
+foreach my $cent ($centers[0]) {
     $obj->center($cent);
     $obj->map_input;
     @bes = $obj->map_output;
@@ -71,6 +67,21 @@ foreach my $cent (@centers) {
 
 $obj->scratch->remove_tree;
 dir_not_exists_ok( "t/tmp", 'scratch directory deleted' );
+
+{ # try out a minimal instance
+
+  my $new_obj = HackaMol::X::Vina->new(
+    receptor       => $receptor->absolute->stringify,
+    ligand         => $lig1->basename,
+    center         => V( 6.865, 3.449, 85.230 ),
+    size           => V( 10, 10, 10 ),
+  );
+
+#  use Data::Dumper;
+#  print Dumper $new_obj;
+  is ($obj->in_fn,      'conf.txt',    'conf.txt is default config file');
+  is ($new_obj->out_fn, 'liblig_out.pdbqt' , 'default output for ligand');
+}
 
 done_testing();
 

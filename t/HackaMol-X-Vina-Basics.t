@@ -41,6 +41,8 @@ my $obj;
 
     lives_ok {
         $obj = HackaMol::X::Vina->new(
+            receptor => 't/lib/receptor.pdbqt',
+            ligand   => 't/lib/receptor.pdbqt',
             center => V( 0,  1,  2 ),
             size   => V( 10, 11, 12 ),
         );
@@ -55,14 +57,23 @@ my $obj;
     is( $obj->size_z,   12, "size_z" );
 
     lives_ok {
-        $obj = HackaMol::X::Vina->new( mol => $mol );
+        $obj = HackaMol::X::Vina->new( 
+                                      mol => $mol , 
+                                      receptor => 't/lib/receptor.pdbqt', 
+                                      ligand   => 't/lib/ligand.pdbqt', 
+                                     );
     }
     'creation of an obj with mol';
 
     dir_not_exists_ok( "t/tmp", 'scratch directory does not exist yet' );
 
     lives_ok {
-        $obj = HackaMol::X::Vina->new( mol => $mol, exe => "vina" );
+        $obj = HackaMol::X::Vina->new( 
+                                      mol => $mol, 
+                                      exe => "vina",
+                                      receptor => 't/lib/receptor.pdbqt', 
+                                      ligand   => 't/lib/ligand.pdbqt', 
+                                     );
     }
     'creation of an obj with exe';
 
@@ -75,6 +86,8 @@ my $obj;
             mol     => $mol,
             exe     => "vina",
             in_fn   => "foo.inp",
+            receptor => 't/lib/receptor.pdbqt', 
+            ligand   => 't/lib/ligand.pdbqt', 
             scratch => "t/tmp"
         );
     }
@@ -93,7 +106,9 @@ my $obj;
             mol     => $mol,
             exe     => "vina",
             in_fn   => "foo.inp",
-            scratch => "t/tmp",
+            scratch => "t/tmp",  
+            receptor => 't/lib/receptor.pdbqt', 
+            ligand   => 't/lib/ligand.pdbqt', 
             command => "nonsense",
         );
     }
@@ -101,6 +116,7 @@ my $obj;
 
     is( $obj->command, "nonsense",
         "command attr not overwritten during build" );
+
     $obj->command( $obj->build_command );
     is( $obj->command, $obj->exe . " --config " . $obj->in_fn,
         "command reset" );
@@ -117,6 +133,8 @@ my $obj;
             out_fn     => "foo.out",
             command    => "nonsense",
             exe_endops => "tackon",
+            receptor => 't/lib/receptor.pdbqt', 
+            ligand   => 't/lib/ligand.pdbqt', 
         );
     }
     'test building of an obj with out_fn';
@@ -137,6 +155,8 @@ my $obj;
 
     $obj = HackaMol::X::Vina->new(
         mol            => $mol,
+        receptor       => 't/lib/receptor.pdbqt', 
+        ligand         => 't/lib/ligand.pdbqt', 
         in_fn          => "foo.inp",
         center         => V( 0, 1, 2 ),
         size           => V( 20, 20, 20 ),
