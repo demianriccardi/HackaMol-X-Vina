@@ -77,7 +77,7 @@ dir_not_exists_ok( "t/tmp", 'scratch directory deleted' );
     size           => V( 10, 10, 10 ),
   );
 
-  my $outlig = $vina->ligand;
+  my $outlig = $vina->ligand->basename;
   $outlig =~ s/\.pdbqt/\_out\.pdbqt/;
 
 

@@ -70,7 +70,7 @@ sub BUILD {
     $self->exe("~/bin/vina") unless $self->has_exe;
 
     unless ( $self->has_out_fn ) {
-      my $outlig = $self->ligand;
+      my $outlig = $self->ligand->basename;
       $outlig =~ s/\.pdbqt/\_out\.pdbqt/;
       $self->out_fn($outlig) unless ($self->has_out_fn); 
     }
