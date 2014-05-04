@@ -5,6 +5,7 @@ use Moose;
 use MooseX::StrictConstructor;
 use Moose::Util::TypeConstraints;
 use Math::Vector::Real;
+use MooseX::Types::Path::Tiny qw(Path) ;
 use HackaMol; # for building molecules
 
 #use MooseX::Types;
@@ -16,9 +17,10 @@ with qw(HackaMol::X::ExtensionRole);
 
 has $_ => ( 
             is        => 'rw', 
-            isa       => 'Str', 
+            isa       => Path, 
             predicate => "has_$_",
             required  => 1,
+            coerce    => 1,
           ) foreach ( qw( receptor ligand ) );
 
 has $_ => (

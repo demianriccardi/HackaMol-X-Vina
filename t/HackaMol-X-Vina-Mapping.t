@@ -71,16 +71,20 @@ dir_not_exists_ok( "t/tmp", 'scratch directory deleted' );
 { # try out a minimal instance
 
   my $new_obj = HackaMol::X::Vina->new(
-    receptor       => $receptor->absolute->stringify,
-    ligand         => $lig1->basename,
+    receptor       => $receptor,
+    ligand         => $lig1,
     center         => V( 6.865, 3.449, 85.230 ),
     size           => V( 10, 10, 10 ),
   );
 
+  my $outlig = $new_obj->ligand;
+  $outlig =~ s/\.pdbqt/\_out\.pdbqt/;
+
+
 #  use Data::Dumper;
 #  print Dumper $new_obj;
-  is ($obj->in_fn,      'conf.txt',    'conf.txt is default config file');
-  is ($new_obj->out_fn, 'liblig_out.pdbqt' , 'default output for ligand');
+  is ($new_obj->in_fn,      'conf.txt', 'conf.txt is default config file');
+  is ($new_obj->out_fn,     $outlig   , 'default output for ligand');
 }
 
 done_testing();
