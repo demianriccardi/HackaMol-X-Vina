@@ -132,7 +132,8 @@ sub dock {
   $self->map_input; 
   my @bes = $self->map_output; 
   my $mol = HackaMol -> new(hush_read => 1)
-                     -> file_read_role($self->out_fn->stringify) if ($self->has_out_fn);
+                     -> read_file_mol($self->out_fn->stringify) if ($self->has_out_fn);
+  return ($mol);
 }
 
 sub write_input {
