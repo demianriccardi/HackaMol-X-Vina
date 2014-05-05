@@ -1,6 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+    * Path to AbsPath for receptor and ligand attributes
 
 0.00_3    2014-05-04 20:48:31EDT-0400 America/New_York
     * improved defaults via BUILD to simplify interface
