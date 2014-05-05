@@ -30,7 +30,6 @@ SYNOPSIS
                center         => $center,
                size           => V( 20, 20, 20 ),
                cpu            => 4,
-               num_modes      => 1,
                exhaustiveness => 12,
                exe            => '~/bin/vina',
                scratch        => 'tmp',

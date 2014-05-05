@@ -189,37 +189,37 @@ __END__
 
 =head1 SYNOPSIS
 
-    use HackaMol;
-    use HackaMol::X::Vina;
-    use Math::Vector::Real;
-    
-    my $receptor = "receptor.pdbqt";
-    my $rmol     = HackaMol -> new( hush_read=>1 ) -> read_file_mol($receptor); 
+       use HackaMol;
+       use HackaMol::X::Vina;
+       use Math::Vector::Real;
 
-    my @centers = map  {$_->xyz}
-                  grep {$_->name    eq "OH" }
-                  grep {$_->resname eq "TYR"} $rmol->all_atoms;
+       my $receptor = "receptor.pdbqt";
+       my $rmol     = HackaMol -> new( hush_read=>1 ) -> read_file_mol( $receptor );
 
-    foreach my $center (@centers){
+       my @centers = map  {$_ -> xyz}
+                     grep {$_ -> name    eq "OH" }
+                     grep {$_ -> resname eq "TYR"} $rmol -> all_atoms;
 
-        my $vina = HackaMol::X::Vina->new(
-            receptor       => $receptor,
-            ligand         => "ligand.pdbqt",
-            in_fn          => "conf.txt",
-            out_fn         => "ligand_out.pdbqt",
-            center         => $center,
-            size           => V( 20, 20, 20 ),
-            cpu            => 4,
-            num_modes      => 1,
-            exhaustiveness => 12,
-            exe            => '~/bin/vina',
-            scratch        => 'tmp',
-        );
-        
-        $vina->map_input;
-        my @bes = $vina->map_output;
+       foreach my $center ( @centers ){
 
-    }
+           my $vina = HackaMol::X::Vina -> new(
+               receptor       => $receptor,
+               ligand         => "ligand.pdbtq",
+               center         => $center,
+               size           => V( 20, 20, 20 ),
+               cpu            => 4,
+               exhaustiveness => 12,
+               exe            => '~/bin/vina',
+               scratch        => 'tmp',
+           );
+
+           my $mol = $vina->dock_mol(3); # fill mol with 3 binding configurations
+
+           printf ("Score: %6.1f\n", $mol->get_score($_) ) foreach (0 .. $mol->tmax);
+
+           $mol->print_ts([0 .. $mol->tmax]);
+
+       }
 
 
 =head1 DESCRIPTION
@@ -232,7 +232,9 @@ interface effectively, please be sure to cite AutoDock Vina in your work:
 
 O. Trott, A. J. Olson, AutoDock Vina: improving the speed and accuracy of docking with a new scoring function, efficient optimization and multithreading, Journal of Computational Chemistry 31 (2010) 455-461 
 
-Since HackaMol has no pdbqt writing capabilities (yet, HackaMol can read pdbqt files), the user is required to provide those 
-files. This is still a work in progress and the API may still change. 
+Since HackaMol has no pdbqt writing capabilities (yet, HackaMol can read pdbqt files), the user is required to provide
+those  files. This is still a work in progress and the API may still change. Documentation will improve as API
+gets more stable... comments welcome!
+
 
 
