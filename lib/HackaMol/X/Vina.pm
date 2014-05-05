@@ -5,7 +5,7 @@ use Moose;
 use MooseX::StrictConstructor;
 use Moose::Util::TypeConstraints;
 use Math::Vector::Real;
-use MooseX::Types::Path::Tiny qw(Path) ;
+use MooseX::Types::Path::Tiny qw(AbsPath) ;
 use HackaMol; # for building molecules
 
 #use MooseX::Types;
@@ -17,7 +17,7 @@ with qw(HackaMol::X::ExtensionRole);
 
 has $_ => ( 
             is        => 'rw', 
-            isa       => Path, 
+            isa       => AbsPath, 
             predicate => "has_$_",
             required  => 1,
             coerce    => 1,
