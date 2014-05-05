@@ -4,10 +4,10 @@ HackaMol extension for running Autodock Vina
 
 VERSION
 ========
-developer version 0.00_2 
+developer version 0.00_3 
 Available for testing from cpan.org:
 
-please see *[HackaMol::X::Vina on MetaCPAN](https://metacpan.org/release/DEMIAN/HackaMol-X-Vina-0.00_2) for formatted documentation.
+please see *[HackaMol::X::Vina on MetaCPAN](https://metacpan.org/release/DEMIAN/HackaMol-X-Vina-0.00_3) for formatted documentation.
 
 SYNOPSIS
 ============
@@ -27,8 +27,6 @@ SYNOPSIS
            my $vina = HackaMol::X::Vina -> new(
                receptor       => $receptor,
                ligand         => "ligand.pdbtq",
-               in_fn          => "conf.txt",
-               out_fn         => "ligand_out.pdbqt",
                center         => $center,
                size           => V( 20, 20, 20 ),
                cpu            => 4,
@@ -37,10 +35,13 @@ SYNOPSIS
                exe            => '~/bin/vina',
                scratch        => 'tmp',
            );
-           
-           $vina -> map_input;
-           my @bes = $vina -> map_output;
-     
+    
+           my $mol = $vina->dock_mol(3); # fill mol with 3 binding configurations 
+
+           printf ("Score: %6.1f\n", $mol->get_score($_) ) foreach (0 .. $mol->tmax);          
+
+           $mol->print_ts([0 .. $mol->tmax]); 
+
        }
 
 DESCRIPTION
@@ -53,6 +54,7 @@ interface effectively, please be sure to cite AutoDock Vina in your work:
 
 O. Trott, A. J. Olson, AutoDock Vina: improving the speed and accuracy of docking with a new scoring function, efficient optimization and multithreading, Journal of Computational Chemistry 31 (2010) 455-461 
 
-Since HackaMol has no pdbqt writing capabilities (yet, HackaMol can read pdbqt files), the user is required to provide those 
-files. This is still a work in progress and the API may still change. 
+Since HackaMol has no pdbqt writing capabilities (yet, HackaMol can read pdbqt files), the user is required to provide 
+those  files. This is still a work in progress and the API may still change. Documentation will improve as API 
+gets more stable... comments welcome! 
 
