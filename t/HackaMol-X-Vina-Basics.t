@@ -79,7 +79,13 @@ my $obj;
 
     dir_not_exists_ok( "t/tmp", 'scratch directory does not exist yet' );
 
-    is( $obj->command, $obj->exe, "command set to exe" );
+    is($obj->in_fn, 'conf.txt', "default configuration file conf.txt" );
+
+    is(
+        $obj->command,
+        $obj->exe . " --config " . $obj->in_fn,
+        "command set to exe and input"
+    );
 
     lives_ok {
         $obj = HackaMol::X::Vina->new(
