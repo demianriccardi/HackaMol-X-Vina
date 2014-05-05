@@ -50,12 +50,12 @@ my $obj;
     lives_ok {
         $obj = HackaMol::X::Vina->new(
             receptor => 't/lib/receptor.pdbqt',
-            ligand   => 't/lib/receptor.pdbqt',
+            ligand   => 't/lib/lig.pdbqt',
             center => V( 0,  1,  2 ),
             size   => V( 10, 11, 12 ),
         );
     }
-    'creation without required mol lives';
+    'barebones object lives';
 
     is( $obj->center_x, 0,  "center_x" );
     is( $obj->center_y, 1,  "center_y" );
@@ -63,31 +63,27 @@ my $obj;
     is( $obj->size_x,   10, "size_x" );
     is( $obj->size_y,   11, "size_y" );
     is( $obj->size_z,   12, "size_z" );
+    is( $obj->out_fn, "lig_out.pdbqt"  , "output name default" );
+    is($obj->in_fn, 'conf.txt', "default configuration file conf.txt" );
 
     lives_ok {
         $obj = HackaMol::X::Vina->new( 
-                                      mol => $mol , 
-                                      receptor => 't/lib/receptor.pdbqt', 
-                                      ligand   => 't/lib/ligand.pdbqt', 
-                                     );
+            mol => $mol , 
+            receptor => 't/lib/receptor.pdbqt',
+            ligand   => 't/lib/lig.pdbqt',
+            in_fn    => 'conf-1.txt',
+            out_fn   => 'lig_out-1.pdbqt',
+            center   => V( 0,  1,  2 ),
+            size     => V( 10, 11, 12 ),
+            exe      => "vina",
+        );
     }
     'creation of an obj with mol';
+    is( $obj->out_fn, "lig_out-1.pdbqt"  , "output name set" );
+    is( $obj->in_fn, 'conf-1.txt', "config name set" );
+    is( $obj->exe, 'vina', "exe set" );
 
     dir_not_exists_ok( "t/tmp", 'scratch directory does not exist yet' );
-
-    lives_ok {
-        $obj = HackaMol::X::Vina->new( 
-                                      mol => $mol, 
-                                      exe => "vina",
-                                      receptor => 't/lib/receptor.pdbqt', 
-                                      ligand   => 't/lib/ligand.pdbqt', 
-                                     );
-    }
-    'creation of an obj with exe';
-
-    dir_not_exists_ok( "t/tmp", 'scratch directory does not exist yet' );
-
-    is($obj->in_fn, 'conf.txt', "default configuration file conf.txt" );
 
     is(
         $obj->command,
@@ -101,7 +97,7 @@ my $obj;
             exe     => "vina",
             in_fn   => "foo.inp",
             receptor => 't/lib/receptor.pdbqt', 
-            ligand   => 't/lib/ligand.pdbqt', 
+            ligand   => 't/lib/lig.pdbqt', 
             scratch => "t/tmp"
         );
     }
@@ -122,7 +118,7 @@ my $obj;
             in_fn   => "foo.inp",
             scratch => "t/tmp",  
             receptor => 't/lib/receptor.pdbqt', 
-            ligand   => 't/lib/ligand.pdbqt', 
+            ligand   => 't/lib/lig.pdbqt', 
             command => "nonsense",
         );
     }
@@ -148,7 +144,7 @@ my $obj;
             command    => "nonsense",
             exe_endops => "tackon",
             receptor => 't/lib/receptor.pdbqt', 
-            ligand   => 't/lib/ligand.pdbqt', 
+            ligand   => 't/lib/lig.pdbqt', 
         );
     }
     'test building of an obj with out_fn';
@@ -170,7 +166,7 @@ my $obj;
     $obj = HackaMol::X::Vina->new(
         mol            => $mol,
         receptor       => 't/lib/receptor.pdbqt', 
-        ligand         => 't/lib/ligand.pdbqt', 
+        ligand         => 't/lib/lig.pdbqt', 
         in_fn          => "foo.inp",
         center         => V( 0, 1, 2 ),
         size           => V( 20, 20, 20 ),
