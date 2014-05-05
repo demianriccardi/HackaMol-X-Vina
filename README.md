@@ -39,7 +39,7 @@ SYNOPSIS
 
            printf ("Score: %6.1f\n", $mol->get_score($_) ) foreach (0 .. $mol->tmax);          
 
-           $mol->print_ts([0 .. $mol->tmax]); 
+           $mol->print_pdb_ts([0 .. $mol->tmax]); 
 
        }
 
