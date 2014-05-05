@@ -76,6 +76,7 @@ dir_not_exists_ok( "t/tmp", 'scratch directory deleted' );
     ligand         => $lig1,
     center         => V( 6.865, 3.449, 85.230 ),
     size           => V( 10, 10, 10 ),
+    scratch        => 't/tmp',
   );
 
   my $outlig = $vina->ligand->basename;
@@ -90,6 +91,8 @@ dir_not_exists_ok( "t/tmp", 'scratch directory deleted' );
   is ($mol->tmax, 1, 'two ts loaded into mol');
   is ($mol->count_atoms, 17, '17 atoms');
   is ($mol->count_score, 2 , '2 scores');
+  $vina->scratch->remove_tree;
+  dir_not_exists_ok( "t/tmp", 'scratch directory deleted' );
 
 }
 

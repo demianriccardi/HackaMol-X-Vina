@@ -7,9 +7,7 @@ use Moose::Util::TypeConstraints;
 use Math::Vector::Real;
 use MooseX::Types::Path::Tiny qw(AbsPath) ;
 use HackaMol; # for building molecules
-
-#use MooseX::Types;
-#use MooseX::Types::Stringlike qw/Stringlike/;
+use File::chdir;
 use namespace::autoclean;
 use Carp;
 
@@ -148,6 +146,7 @@ sub dock_mol {
   my $num_modes = shift || 1;
   $self->num_modes($num_modes);
   $self->map_input; 
+  local $CWD = $self->scratch if ( $self->has_scratch );
   my @bes = $self->map_output; # this is fragile... broken if map_out changed...
   my $mol = HackaMol -> new(hush_read => 1)
                      -> read_file_mol($self->out_fn->stringify);

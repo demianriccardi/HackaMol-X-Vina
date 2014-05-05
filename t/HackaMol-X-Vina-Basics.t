@@ -174,7 +174,7 @@ my $obj;
         homedir        => '.',
     );
 
-    my $input = $obj->map_input;
+    my $input = $obj->map_input; 
     $CWD = $obj->scratch;
     my $input2 = $obj->in_fn->slurp;
     is( $input, $input2,
