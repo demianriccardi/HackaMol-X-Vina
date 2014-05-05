@@ -23,8 +23,16 @@ my $cwd = getcwd;
 
 {    # test HackaMol class attributes and methods
 
-    my @attributes = qw(mol map_in map_out);
-    my @methods    = qw(map_input map_output);
+    my @attributes = qw(
+                        mol map_in map_out receptor ligand save_mol 
+                        center_x center_y center_z size_x size_y size_z
+                        num_modes energy_range exhaustiveness seed cpu
+                        center size
+                       );
+    my @methods    = qw(
+                        build_command write_input map_input map_output 
+                        dock dock_mol
+                       );
 
     my @roles = qw(HackaMol::ExeRole HackaMol::PathRole);
 
