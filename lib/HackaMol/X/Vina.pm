@@ -23,6 +23,13 @@ has $_ => (
             coerce    => 1,
           ) foreach ( qw( receptor ligand ) );
 
+has 'save_mol' => (
+            is      => 'rw',
+            isa     => 'Bool',
+            default => 0,
+);        
+   
+
 has $_ => (
     is        => 'rw',
     isa       => 'Num',
@@ -109,10 +116,12 @@ sub build_command {
 }
 
 sub _build_map_in {
+    # this builds the default behavior, can be set anew via new
     return sub { return ( shift->write_input ) };
 }
 
 sub _build_map_out {
+    # this builds the default behavior, can be set anew via new
     my $sub_cr = sub {
         my $self = shift;
         my $qr   = qr/^\s+\d+\s+(-*\d+\.\d)/;
@@ -124,15 +133,25 @@ sub _build_map_out {
     };
     return $sub_cr;
 }
+
 sub dock {
+  my $self      = shift;
+  my $num_modes = shift || 1;
+  $self->num_modes($num_modes);
+  $self->map_input;
+  return $self->map_output;
+}
+
+sub dock_mol {
   # want this to return configurations of the molecule
   my $self      = shift;
   my $num_modes = shift || 1;
   $self->num_modes($num_modes);
   $self->map_input; 
-  my @bes = $self->map_output; 
+  my @bes = $self->map_output; # this is fragile... broken if map_out changed...
   my $mol = HackaMol -> new(hush_read => 1)
-                     -> read_file_mol($self->out_fn->stringify) if ($self->has_out_fn);
+                     -> read_file_mol($self->out_fn->stringify);
+  $mol->push_score(@bes);
   return ($mol);
 }
 

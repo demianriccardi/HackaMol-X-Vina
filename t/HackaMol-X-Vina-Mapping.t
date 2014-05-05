@@ -69,6 +69,7 @@ $obj->scratch->remove_tree;
 dir_not_exists_ok( "t/tmp", 'scratch directory deleted' );
 
 { # try out a minimal instance
+  use Time::HiRes qw(time);
 
   my $vina = HackaMol::X::Vina->new(
     receptor       => $receptor,
@@ -80,14 +81,15 @@ dir_not_exists_ok( "t/tmp", 'scratch directory deleted' );
   my $outlig = $vina->ligand->basename;
   $outlig =~ s/\.pdbqt/\_out\.pdbqt/;
 
-
 #  use Data::Dumper;
 #  print Dumper $vina;
   is ($vina->in_fn,      'conf.txt', 'conf.txt is default config file');
   is ($vina->out_fn,     $outlig   , 'default output for ligand');
- 
-  my $mol = $vina->dock(2);
-  $mol->print_pdb_ts([0,1]); 
+
+  my $mol = $vina->dock_mol(2);
+  is ($mol->tmax, 1, 'two ts loaded into mol');
+  is ($mol->count_atoms, 17, '17 atoms');
+  is ($mol->count_score, 2 , '2 scores');
 
 }
 
