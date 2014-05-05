@@ -77,7 +77,7 @@ sub BUILD {
     unless ( $self->has_out_fn ) {
       my $outlig = $self->ligand->basename;
       $outlig =~ s/\.pdbqt/\_out\.pdbqt/;
-      $self->out_fn($outlig) unless ($self->has_out_fn); 
+      $self->out_fn($outlig); 
     }
 
     unless ( $self->has_command ) {
@@ -107,7 +107,7 @@ sub build_command {
     my $self = shift;
     my $cmd;
     $cmd = $self->exe;
-    $cmd .= " --config " . $self->in_fn->stringify if $self->has_in_fn;
+    $cmd .= " --config " . $self->in_fn->stringify;
 
     # we always capture output
     return $cmd;
@@ -156,14 +156,8 @@ sub dock_mol {
 
 sub write_input {
     my $self = shift;
-
-    unless ( $self->has_in_fn ) {
-        croak "no vina in_fn for writing input";
-    }
-
     my $input;
-    $input .= sprintf( "%-15s = %-55s\n", 'out', $self->out_fn->stringify )
-      if $self->has_out_fn;
+    $input .= sprintf( "%-15s = %-55s\n", 'out', $self->out_fn->stringify );
     $input .= sprintf( "%-15s = %-55s\n", 'log', $self->log_fn->stringify )
       if $self->has_log_fn;
     foreach my $cond (
@@ -188,36 +182,44 @@ __END__
 
 =head1 SYNOPSIS
 
+         use Modern::Perl;
          use HackaMol;
          use HackaMol::X::Vina;
          use Math::Vector::Real;
-  
+
          my $receptor = "receptor.pdbqt";
-         my $rmol     = HackaMol -> new( hush_read=>1 ) -> read_file_mol( $receptor ); 
-  
+         my $ligand   = "lig.pdbqt",
+         my $rmol     = HackaMol -> new( hush_read=>1 ) -> read_file_mol( $receptor );
+         my $lmol     = HackaMol -> new( hush_read=>1 ) -> read_file_mol( $ligand );
+         my $fh = $lmol->print_pdb("lig_out.pdb");
+
          my @centers = map  {$_ -> xyz}
                        grep {$_ -> name    eq "OH" }
                        grep {$_ -> resname eq "TYR"} $rmol -> all_atoms;
-  
+
          foreach my $center ( @centers ){
-  
+
              my $vina = HackaMol::X::Vina -> new(
                  receptor       => $receptor,
-                 ligand         => "lig.pdbqt",
+                 ligand         => $ligand,
                  center         => $center,
                  size           => V( 20, 20, 20 ),
                  cpu            => 4,
                  exhaustiveness => 12,
                  exe            => '~/bin/vina',
+                 scratch        => 'tmp',
              );
-  
-             my $mol = $vina->dock_mol(3); # fill mol with 3 binding configurations 
-  
-             printf ("Score: %6.1f\n", $mol->get_score($_) ) foreach (0 .. $mol->tmax);          
-  
-             $mol->print_pdb_ts([0 .. $mol->tmax]); 
-  
-         }
+
+             my $mol = $vina->dock_mol(3); # fill mol with 3 binding configurations
+
+             printf ("Score: %6.1f\n", $mol->get_score($_) ) foreach (0 .. $mol->tmax); 
+
+             $mol->print_pdb_ts([0 .. $mol->tmax], $fh); 
+
+           }
+
+           $_->segid("hgca") foreach $rmol->all_atoms; #for vmd rendering cartoons.. etc
+           $rmol->print_pdb("receptor.pdb");
 
 
 =head1 DESCRIPTION

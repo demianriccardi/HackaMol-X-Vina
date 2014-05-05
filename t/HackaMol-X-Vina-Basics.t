@@ -95,7 +95,6 @@ my $obj;
         $obj = HackaMol::X::Vina->new(
             mol     => $mol,
             exe     => "vina",
-            in_fn   => "foo.inp",
             receptor => 't/lib/receptor.pdbqt', 
             ligand   => 't/lib/lig.pdbqt', 
             scratch => "t/tmp"
@@ -110,17 +109,36 @@ my $obj;
         "command set to exe and input"
     );
     is( $obj->scratch, "$cwd/t/tmp", "scratch directory" );
+ 
+    $obj->scratch->remove_tree;
+    dir_not_exists_ok( "t/tmp", 'scratch directory deleted' );
 
     lives_ok {
         $obj = HackaMol::X::Vina->new(
             mol     => $mol,
             exe     => "vina",
-            in_fn   => "foo.inp",
             scratch => "t/tmp",  
             receptor => 't/lib/receptor.pdbqt', 
             ligand   => 't/lib/lig.pdbqt', 
-            command => "nonsense",
         );
+    }
+    'test building of an obj with exisiting scratch  and command attr';
+
+    is(
+        $obj->command,
+        $obj->exe . " --config conf.txt" ,
+        "command set to exe"
+    );
+
+    lives_ok {
+        $obj = HackaMol::X::Vina->new(
+            mol     => $mol,
+            exe     => "vina",
+            scratch => "t/tmp",  
+            receptor => 't/lib/receptor.pdbqt', 
+            ligand   => 't/lib/lig.pdbqt',
+            command  => 'nonsense', 
+       );
     }
     'test building of an obj with exisiting scratch  and command attr';
 
