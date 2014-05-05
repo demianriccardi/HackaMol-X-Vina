@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+0.00_3    2014-05-04 20:48:31EDT-0400 America/New_York
     * improved defaults via BUILD to simplify interface
     * added dock and dock_mol... pod to be added soon 
 
