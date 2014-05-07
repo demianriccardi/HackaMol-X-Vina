@@ -238,11 +238,15 @@ gets more stable... comments welcome!
 
 =method write_input
 
-returns input constructed from attributes as a scalar.  Default builder of map_in code reference  
+This method takes no arguments; it returns, as a scalar, the input constructed from attributes.  This method is called by map_input method via the map_in attribute. 
 
 =method map_input
 
+provided by HackaMol::X::ExtensionRole. Writes the configuration file for Vina. See dock and dock_mol methods.
+
 =method map_output
+
+provided by HackaMol::X::ExtensionRole. By default, this method returns the docking scores as an array.
 
 =method dock_mol
 
