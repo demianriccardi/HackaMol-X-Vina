@@ -250,6 +250,8 @@ provided by HackaMol::X::ExtensionRole. By default, this method returns the dock
 
 =method dock_mol
 
+this method will call the map_input and map_output methods to run an instance of Vina. It will load the resulting pdbqt and scores into a HackaMol::Molecule object.  The scores are stored into the score attribute provided by the HackaMol::QmMolRole.
+
 =method dock
 
 
