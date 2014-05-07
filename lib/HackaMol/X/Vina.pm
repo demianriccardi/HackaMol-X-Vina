@@ -236,5 +236,16 @@ Since HackaMol has no pdbqt writing capabilities (yet, HackaMol can read pdbqt f
 those  files. This is still a work in progress and the API may still change. Documentation will improve as API
 gets more stable... comments welcome!
 
+=method write_input
+
+returns input constructed from attributes as a scalar.  Default builder of map_in code reference  
+
+=method map_input
+
+=method map_output
+
+=method dock_mol
+
+=method dock
 
 
