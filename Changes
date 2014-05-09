@@ -1,7 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
-    * Improved documentation
+    * Completed first draft of POD
 
 0.00_4    2014-05-05 10:59:33EDT-0400 America/New_York
     * Path to AbsPath for receptor and ligand attributes
