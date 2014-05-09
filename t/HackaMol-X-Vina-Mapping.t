@@ -104,6 +104,7 @@ dir_not_exists_ok( "t/tmp", 'scratch directory deleted' );
     ligand         => $lig1,
     center         => V( 6.865, 3.449, 85.230 ),
     size           => V( 10, 10, 10 ),
+    num_modes      => 1,
     scratch        => 't/tmp',
     exhaustiveness =>1, #nonmiminal
     cpu            =>1, #nonmiminal
