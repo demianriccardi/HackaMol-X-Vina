@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+0.00_5    2014-05-09 15:29:37EDT-0400 America/New_York
     * Completed first draft of POD
 
 0.00_4    2014-05-05 10:59:33EDT-0400 America/New_York
