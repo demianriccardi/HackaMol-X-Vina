@@ -52,15 +52,25 @@ SYNOPSIS
 
 DESCRIPTION
 ============
-HackaMol::X::Vina provides an interface to AutoDock Vina. This class does not include the AutoDock Vina program, which is 
-[released under a very permissive Apache license](http://vina.scripps.edu/manual.html#license), with few restrictions on 
-commercial or non-commercial use, or on the derivative works, such is this. Follow these 
-[instructions ] (http://vina.scripps.edu/manual.html#installation) to acquire the program. Most importantly, if you use this 
-interface effectively, please be sure to cite AutoDock Vina in your work:
+HackaMol::X::Vina provides an interface to AutoDock Vina, which is a widely used program for docking small molecules
+(ligands) into biological molecules (receptors). This class provides methods for writing configuration files and for 
+processing output. The input/output associated with running Vina is pretty simple, but there is still a fair amount of
+scripting required to apply the program to virtual drug-screens that often involve sets of around 100,000 ligands,
+several
+sites within a given receptor, which may also have multiple configurations.  The goal of this interface is to reduce 
+the amount of scripting needed to set up massive drug screens, provide flexibility in analysis/application, and improve
+control of what is written into files that can quickly accumulate. This class does not include the AutoDock Vina
+program, 
+which is [released under a very permissive Apache license](http://vina.scripps.edu/manual.html#license), with few 
+restrictions on commercial or non-commercial use, or on the derivative works, such is this. Follow these 
+[instructions ] (http://vina.scripps.edu/manual.html#installation) to acquire the program. Most importantly, if 
+you use this interface effectively, please be sure to cite AutoDock Vina in your work:
 
-O. Trott, A. J. Olson, AutoDock Vina: improving the speed and accuracy of docking with a new scoring function, efficient optimization and multithreading, Journal of Computational Chemistry 31 (2010) 455-461 
+O. Trott, A. J. Olson, AutoDock Vina: improving the speed and accuracy of docking with a new scoring function, efficient
+optimization and multithreading, Journal of Computational Chemistry 31 (2010) 455-461 
 
-Since HackaMol has no pdbqt writing capabilities (yet, HackaMol can read pdbqt files), the user is required to provide 
-those  files. This is still a work in progress and the API may still change. Documentation will improve as API 
-gets more stable... comments welcome! 
-
+Since HackaMol has no pdbqt writing capabilities (yet, HackaMol can read pdbqt files), the user is required to provide
+those  files. [OpenBabel] (http://openbabel.org/wiki/Main_Page) and [MGLTools] (http://mgltools.scripps.edu) are popular
+and effective. This is still a work in progress and the API may change. Documentation will improve as API
+gets more stable... comments/contributions welcome!  The automated testing reported on metacpan will likely give a bunch 
+of fails until I have time to figure out how to skip tests calling on the vina program to run.  
