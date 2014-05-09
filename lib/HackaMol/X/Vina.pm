@@ -134,8 +134,8 @@ sub _build_map_out {
 
 sub dock {
   my $self      = shift;
-  my $num_modes = shift || 1;
-  $self->num_modes($num_modes);
+  my $num_modes = shift;
+  $self->num_modes($num_modes) if defined($num_modes);
   $self->map_input;
   return $self->map_output;
 }
@@ -143,8 +143,8 @@ sub dock {
 sub dock_mol {
   # want this to return configurations of the molecule
   my $self      = shift;
-  my $num_modes = shift || 1;
-  $self->num_modes($num_modes);
+  my $num_modes = shift;
+  $self->num_modes($num_modes) if defined($num_modes);
   $self->map_input; 
   local $CWD = $self->scratch if ( $self->has_scratch );
   my @bes = $self->map_output; # this is fragile... broken if map_out changed...
@@ -182,44 +182,44 @@ __END__
 
 =head1 SYNOPSIS
 
-         use Modern::Perl;
-         use HackaMol;
-         use HackaMol::X::Vina;
-         use Math::Vector::Real;
+  use Modern::Perl;
+  use HackaMol;
+  use HackaMol::X::Vina;
+  use Math::Vector::Real;
 
-         my $receptor = "receptor.pdbqt";
-         my $ligand   = "lig.pdbqt",
-         my $rmol     = HackaMol -> new( hush_read=>1 ) -> read_file_mol( $receptor );
-         my $lmol     = HackaMol -> new( hush_read=>1 ) -> read_file_mol( $ligand );
-         my $fh = $lmol->print_pdb("lig_out.pdb");
+  my $receptor = "receptor.pdbqt";
+  my $ligand   = "lig.pdbqt",
+  my $rmol     = HackaMol -> new( hush_read=>1 ) -> read_file_mol( $receptor );
+  my $lmol     = HackaMol -> new( hush_read=>1 ) -> read_file_mol( $ligand );
+  my $fh = $lmol->print_pdb("lig_out.pdb");
 
-         my @centers = map  {$_ -> xyz}
-                       grep {$_ -> name    eq "OH" }
-                       grep {$_ -> resname eq "TYR"} $rmol -> all_atoms;
+  my @centers = map  {$_ -> xyz}
+                grep {$_ -> name    eq "OH" }
+                grep {$_ -> resname eq "TYR"} $rmol -> all_atoms;
 
-         foreach my $center ( @centers ){
+  foreach my $center ( @centers ){
 
-             my $vina = HackaMol::X::Vina -> new(
-                 receptor       => $receptor,
-                 ligand         => $ligand,
-                 center         => $center,
-                 size           => V( 20, 20, 20 ),
-                 cpu            => 4,
-                 exhaustiveness => 12,
-                 exe            => '~/bin/vina',
-                 scratch        => 'tmp',
-             );
+      my $vina = HackaMol::X::Vina -> new(
+          receptor       => $receptor,
+          ligand         => $ligand,
+          center         => $center,
+          size           => V( 20, 20, 20 ),
+          cpu            => 4,
+          exhaustiveness => 12,
+          exe            => '~/bin/vina',
+          scratch        => 'tmp',
+      );
 
-             my $mol = $vina->dock_mol(3); # fill mol with 3 binding configurations
+      my $mol = $vina->dock_mol(3); # fill mol with 3 binding configurations
 
-             printf ("Score: %6.1f\n", $mol->get_score($_) ) foreach (0 .. $mol->tmax); 
+      printf ("Score: %6.1f\n", $mol->get_score($_) ) foreach (0 .. $mol->tmax); 
 
-             $mol->print_pdb_ts([0 .. $mol->tmax], $fh); 
+      $mol->print_pdb_ts([0 .. $mol->tmax], $fh); 
 
-           }
+    }
 
-           $_->segid("hgca") foreach $rmol->all_atoms; #for vmd rendering cartoons.. etc
-           $rmol->print_pdb("receptor.pdb");
+    $_->segid("hgca") foreach $rmol->all_atoms; #for vmd rendering cartoons.. etc
+    $rmol->print_pdb("receptor.pdb");
 
 
 =head1 DESCRIPTION
@@ -250,8 +250,10 @@ provided by HackaMol::X::ExtensionRole. By default, this method returns the dock
 
 =method dock_mol
 
-this method will call the map_input and map_output methods to run an instance of Vina. It will load the resulting pdbqt and scores into a HackaMol::Molecule object.  The scores are stored into the score attribute provided by the HackaMol::QmMolRole.
+this method takes the number of binding modes (Integer) as an argument (Int). The argument is optional, and the num_modes attribute is rewritten if passed. This method calls the map_input and map_output methods for preparing and running Vina. It loads the resulting pdbqt and scores into a HackaMol::Molecule object.  The scores are stored into the score attribute provided by the HackaMol::QmMolRole. See the synopsis for an example.
 
 =method dock
+
+this method is similar to dock_mol, but returns only the scores.
 
 
