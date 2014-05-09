@@ -59,9 +59,12 @@ scripting required to apply the program to virtual drug-screens that often invol
 several
 sites within a given receptor, which may also have multiple configurations.  The goal of this interface is to reduce 
 the amount of scripting needed to set up massive drug screens, provide flexibility in analysis/application, and improve
-control of what is written into files that can quickly accumulate. This class does not include the AutoDock Vina
-program, 
-which is [released under a very permissive Apache license](http://vina.scripps.edu/manual.html#license), with few 
+control of what is written into files that can quickly accumulate. The synopsis above loops the docking over centers 
+determined with a chain of grep and map functions.  Loops over ligands, receptors, centers are straightforward to
+implement, see examples (coming soon). 
+
+This class does not include the AutoDock Vina program, which is 
+[released under a very permissive Apache license](http://vina.scripps.edu/manual.html#license), with few 
 restrictions on commercial or non-commercial use, or on the derivative works, such is this. Follow these 
 [instructions ] (http://vina.scripps.edu/manual.html#installation) to acquire the program. Most importantly, if 
 you use this interface effectively, please be sure to cite AutoDock Vina in your work:

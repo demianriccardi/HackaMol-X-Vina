@@ -228,10 +228,14 @@ HackaMol::X::Vina provides an interface to AutoDock Vina, which is a widely used
 (ligands) into biological molecules (receptors). This class provides methods for writing configuration files and for 
 processing output. The input/output associated with running Vina is pretty simple, but there is still a fair amount of
 scripting required to apply the program to virtual drug-screens that often involve sets of around 100,000 ligands, several
-sites within a given receptor, which may also have multiple configurations.  The goal of this interface is to reduce 
+sites (centers) within a given receptor, which may also have multiple configurations.  The goal of this interface is to reduce 
 the amount of scripting needed to set up massive drug screens, provide flexibility in analysis/application, and improve
-control of what is written into files that can quickly accumulate. This class does not include the AutoDock Vina program, 
-which is L<released under a very permissive Apache license|http://vina.scripps.edu/manual.html#license>, with few 
+control of what is written into files that can quickly accumulate. The synopsis above loops the docking over centers 
+determined with a chain of grep and map functions.  Loops over ligands, receptors, centers are straightforward to
+implement, see examples (coming soon). 
+
+This class does not include the AutoDock Vina program, which is 
+L<released under a very permissive Apache license|http://vina.scripps.edu/manual.html#license>, with few 
 restrictions on commercial or non-commercial use, or on the derivative works, such is this. Follow these 
 L<instructions | http://vina.scripps.edu/manual.html#installation> to acquire the program. Most importantly, if 
 you use this interface effectively, please be sure to cite AutoDock Vina in your work:
@@ -241,7 +245,7 @@ O. Trott, A. J. Olson, AutoDock Vina: improving the speed and accuracy of dockin
 Since HackaMol has no pdbqt writing capabilities (yet, HackaMol can read pdbqt files; hush_read=>1 recommended, see
 synopsis), the user is required to provide those  files. L<OpenBabel| http://openbabel.org/wiki/Main_Page> and L<MGLTools| http://mgltools.scripps.edu> are popular
 and effective. This is still a work in progress and the API may change. Documentation will improve as API
-gets more stable... comments/contributions welcome!  The automated testing reported on metacpan will likely give a bunch 
+gets more stable... comments/contributions welcome! The automated testing reported on metacpan will likely give a bunch 
 of fails until I have time to figure out how to skip tests calling on the vina program to run.  
 
 =method write_input
@@ -340,3 +344,12 @@ wanted (by me anyway); thus, the default is always set and written to the config
 of Vina will be running at the same time in the same directory, the output will need to be unique for each one as
 described above.
 
+=head1 SEE ALSO
+
+=for :list
+* L<HackaMol>
+* L<HackaMol::X::ExtensionRole>
+* L<HackaMol::X::Calculator>
+* L<Vina | http://vina.scripps.edu>
+* L<MGLTools   | http://mgltools.scripps.edu>
+* L<Open Babel | http://openbabel.org>
