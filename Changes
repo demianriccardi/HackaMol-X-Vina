@@ -1,6 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+    * Improved POD descriptions
 
 0.00_5    2014-05-09 15:29:37EDT-0400 America/New_York
     * Completed first draft of POD

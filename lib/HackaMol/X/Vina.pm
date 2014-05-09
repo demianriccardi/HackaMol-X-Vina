@@ -350,6 +350,7 @@ described above.
 * L<HackaMol>
 * L<HackaMol::X::ExtensionRole>
 * L<HackaMol::X::Calculator>
+* L<PBS::Client>
 * L<Vina | http://vina.scripps.edu>
 * L<MGLTools   | http://mgltools.scripps.edu>
 * L<Open Babel | http://openbabel.org>
