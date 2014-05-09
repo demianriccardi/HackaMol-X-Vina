@@ -238,8 +238,8 @@ you use this interface effectively, please be sure to cite AutoDock Vina in your
 
 O. Trott, A. J. Olson, AutoDock Vina: improving the speed and accuracy of docking with a new scoring function, efficient optimization and multithreading, Journal of Computational Chemistry 31 (2010) 455-461 
 
-Since HackaMol has no pdbqt writing capabilities (yet, HackaMol can read pdbqt files), the user is required to provide
-those  files. L<OpenBabel| http://openbabel.org/wiki/Main_Page> and L<MGLTools| http://mgltools.scripps.edu> are popular
+Since HackaMol has no pdbqt writing capabilities (yet, HackaMol can read pdbqt files; hush_read=>1 recommended, see
+synopsis), the user is required to provide those  files. L<OpenBabel| http://openbabel.org/wiki/Main_Page> and L<MGLTools| http://mgltools.scripps.edu> are popular
 and effective. This is still a work in progress and the API may change. Documentation will improve as API
 gets more stable... comments/contributions welcome!  The automated testing reported on metacpan will likely give a bunch 
 of fails until I have time to figure out how to skip tests calling on the vina program to run.  
