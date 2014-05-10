@@ -230,9 +230,11 @@ processing output. The input/output associated with running Vina is pretty simpl
 scripting required to apply the program to virtual drug-screens that often involve sets of around 100,000 ligands, several
 sites (centers) within a given receptor, which may also have multiple configurations.  The goal of this interface is to reduce 
 the amount of scripting needed to set up massive drug screens, provide flexibility in analysis/application, and improve
-control of what is written into files that can quickly accumulate. The synopsis above loops the docking over centers 
-determined with a chain of grep and map functions.  Loops over ligands, receptors, centers are straightforward to
-implement, see examples (coming soon). 
+control of what is written into files that can quickly accumulate. For example, the synopsis docks a ligand into a 
+receptor for a collection of centers located at the hydroxy group of tyrosine residues; there are a multitude of binding
+site prediction software that can be used to provide a collection of centers. Loops over ligands, receptors, centers are 
+straightforward to implement, but large screens on a computer cluster will require splitting the loops into chunks that
+can be spread across the queueing system.  Examples will follow.
 
 This class does not include the AutoDock Vina program, which is 
 L<released under a very permissive Apache license|http://vina.scripps.edu/manual.html#license>, with few 
