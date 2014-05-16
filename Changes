@@ -1,7 +1,10 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+0.00_7    2014-05-16 12:54:54EDT-0400 America/New_York
     * More POD changes
+    * Examples added for virtual screens
 
 0.00_6    2014-05-09 19:56:41EDT-0400 America/New_York
     * Improved POD descriptions
