@@ -143,7 +143,7 @@ my $json = new JSON::XS;
 $json->incr_parse($text);
 
 # hackamol instance for building and logging
-my $hack = HackaMol->new( hush_read => 1, log_fn => $djob->{out_json} );    #
+my $hack = HackaMol->new( hush_read => 1, log_fn => $vina->scratch->tempfile);    #
 
 my $ligand;
 my $stor = {};
@@ -228,6 +228,8 @@ $best->{total_time} = $tp2 - $tp1;
 $best->{dock_time}  = $tdock;
 
 print Dump $best;
+
+$hack->log_fn->move($djob->{out_json});
 
 sub pack_up {
 
