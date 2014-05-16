@@ -143,8 +143,14 @@ my $json = new JSON::XS;
 $json->incr_parse($text);
 
 # hackamol instance for building and logging
-my $hack = HackaMol->new( hush_read => 1, log_fn => $vina->scratch->tempfile);    #
-
+my $hack = HackaMol->new( hush_read => 1, 
+                             log_fn => Path::Tiny->tempfile(
+                                         TEMPLATE => $djob->{name}."_XXXX",
+                                         DIR      => $vina->scratch, 
+                                         SUFFIX   => '.json',
+                                         UNLINK   => 0,
+                                        ),
+                        );
 my $ligand;
 my $stor = {};
 
@@ -229,7 +235,7 @@ $best->{dock_time}  = $tdock;
 
 print Dump $best;
 
-$hack->log_fn->move($djob->{out_json});
+$hack->log_fn->move( $vina->scratch->child($djob->{out_json})->stringify );
 
 sub pack_up {
 
