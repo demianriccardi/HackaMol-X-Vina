@@ -145,9 +145,9 @@ $json->incr_parse($text);
 # hackamol instance for building and logging
 my $hack = HackaMol->new( hush_read => 1, 
                              log_fn => Path::Tiny->tempfile(
-                                         TEMPLATE => $djob->{name}."_XXXX",
+                                         TEMPLATE => "TMP_". $djob->{name}."_XXXX",
                                          DIR      => $vina->scratch, 
-                                         SUFFIX   => '.json',
+                                         SUFFIX   => '.JSON',
                                          UNLINK   => 0,
                                         ),
                         );
@@ -235,7 +235,7 @@ $best->{dock_time}  = $tdock;
 
 print Dump $best;
 
-$hack->log_fn->move( $vina->scratch->child($djob->{out_json})->stringify );
+$hack->log_fn->move( $djob->{out_json} );
 
 sub pack_up {
 
