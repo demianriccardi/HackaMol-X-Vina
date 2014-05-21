@@ -1,7 +1,7 @@
-# Demian Riccardi May 13, 2014
+# Demian Riccardi May 20, 2014
 #
 # This script is for running virtual screens using Autodock Vina.  This is a work in
-# progress!  Eventually, the functionality will be encapsulated in a class for screening.
+# progress...  Eventually, the functionality will be encapsulated in a class for screening.
 # Obviously, this needs to be reworked to use a proper database!
 #
 # INPUT:
@@ -11,6 +11,9 @@
 #   The json file will contain the ligand information (TMass, formula, BEST => {BE = 0},
 #   etc. ). This script iterates (see JSON::XS on metacpan) through this json loaded by 
 #   ligand and running the centers and receptors from the YAML configuration file.  
+#
+#   You are encouraged load the json file and then dump it with YAML early and often
+#   to get oriented with the datastructure.
 #
 #   The set of centers are assumed to correspond to the set of receptors! 
 #   e.g. two receptors with very different coordinates (translation) should have two
@@ -36,17 +39,15 @@
 # be_cutoff: -8.0
 # dist_cutoff: 4.0
 # scratch:  runs/ZINC_drugs_now_80
-# in_json:  runs/ZINC_drugs_now_80/set_0.json
-# out_json: runs/ZINC_drugs_now_80/set_0.json
+# in_json:  runs/ZINC_drugs_now_80/set_000.json
+# out_json: runs/ZINC_drugs_now_80/set_000.json
 # receptors:
 # - /home/some/path/receptors/rec1.pdbqt
 # - /home/some/path/receptors/rec2.pdbqt
 # - /home/some/path/receptors/rec3.pdbqt
 # - /home/some/path/receptors/rec4.pdbqt
 # centers:
-# - - -10.95
-#   - 6.375
-#   - 3.2
+# - - [ -10.95, 6.375, 3.2]
 # - - 14.4
 #   - -5.4
 #   - 4.1
@@ -70,10 +71,10 @@
 #   be_cutoff      => number ("kcal/mol" vina), if BE < be_cutoff, store more info
 #   dist_cutoff    => number (angstroms), if distance(atom_rec atom_lig) < dist_cutoff bin the 
 #                     recepter residue, stored under NeighRes => {} 
-#   scratch        => directory where the work is carried out 
+#   scratch        => directory (arbitrary path) where the work is carried out 
 #                     (may be in the same or different directory as json file)
-#   in_json        => json containing ligands to run docking
-#   out_json       => json file to write result from docking into info containing ligands
+#   in_json        => json containing hash keyed by ligands to run docking
+#   out_json       => json file to write result from docking into same datastructure as in_json
 #   receptors      => array_ref [receptors to dock the ligands into at the centers]
 #   centers        => array_ref of array_ref [ [x1,y1,z1], [x2,y2,z2] ]
 #
@@ -83,10 +84,16 @@
 #   STDERR: some carping if ligands are ignored or results overwritten
 #   STDOUT: dumped yaml with info about best ligand, center, and receptor combo that was screened
 #
-#   if using pbs, this information will dump into the .e and .o files (.o accumulator script included)
+#   if using pbs, this information will dump into the .e and .o files (.o todo: dock_accumulator.pl)
 #
-#   JSON: This script stores a new json file with name based on the one provided. input.json -> input.json.new  
-#   See merge_docks.pl for combining results.
+#   JSON: This script will write to a temporary file incremented complete json hash for each ligand.
+#     this is different than the json file loaded, which is one hash keyed by ligand!  The temporary
+#     file is writted so that if the run is terminated, the data won't be lost. To convert the temp
+#     file to the out_json file, you have to convert something like {liga}{ligb}{ligc}{ligd} to 
+#     {liga=>{}, ligb=>{}, ...} but be careful if merging with data rich json files (so you don't 
+#     lose data)... i.e. backup.
+#
+#   scripts todo: merge_docks.pl for combining results safely.
 #
 #   See dock_these.pl for screening ligands/centers/receptors
 #
@@ -96,6 +103,7 @@ use HackaMol::X::Vina;
 use Math::Vector::Real;
 use YAML::XS qw(Dump LoadFile);
 use Time::HiRes qw(time);
+use Path::Tiny;
 use File::Slurp;
 use JSON::XS;
 
@@ -106,9 +114,9 @@ my $djob        = LoadFile($yaml_config);
 
 #set some default configurations
 #
-$djob->{overwrite_json}=0           unless( exists( $djob->{overwrite_json}) );
-$djob->{out_json}= $djob->{in_json} unless( exists( $djob->{out_json}) );
-$djob->{rerun} = 0                  unless( exists( $djob->{rerun}) );
+$djob->{overwrite_json} = 0          unless( exists( $djob->{overwrite_json}) );
+$djob->{out_json} = $djob->{in_json} unless( exists( $djob->{out_json}) );
+$djob->{rerun} = 0                   unless( exists( $djob->{rerun}) );
 
 unless ($djob->{overwrite_json}){
   if( $djob->{out_json} eq $djob->{in_json}){
@@ -141,6 +149,7 @@ my $vina = HackaMol::X::Vina->new(
 my $text = read_file( $json_fn, { binmode => ':raw' } );
 my $json = new JSON::XS;
 $json->incr_parse($text);
+my $stor = $json->incr_parse;
 
 # hackamol instance for building and logging
 my $hack = HackaMol->new( hush_read => 1, 
@@ -152,39 +161,38 @@ my $hack = HackaMol->new( hush_read => 1,
                                         ),
                         );
 my $ligand;
-my $stor = {};
-
-my $best = { BE => 0 };
+$stor->{BEST}{BE}=0 unless (exists($stor->{BEST}{BE}));
 my $fh = $hack->log_fn->openw_raw; 
 my $doing_again = 0;
 my $from_last_time = {};
 
-while ( my $stor = $json->incr_parse ) {
-
-    my ($lbase) = keys(%$stor);            # only 1 key
-    my $ligand = $stor->{$lbase}{lpath};
+foreach my $lig (grep {!/BEST/} keys %{$stor}){ 
+    my $ligand = $stor->{$lig}{lpath};
     $vina->ligand($ligand);
+    $stor->{$lig}{BEST}{BE}= 999 unless ( exists( $stor->{$lig}{BEST}{BE} ) );
 
+    my $best_today = 0;
     foreach my $receptor ( @{ $djob->{receptors} } ) {
 
         $vina->receptor($receptor);
         my $rec   = $hack->read_file_mol($receptor);
         my $rbase = $vina->receptor->basename('.pdbqt');
 
-        $stor->{$lbase}{receptor}{$rbase}{rpath} = $vina->receptor->stringify;
+        $stor->{$lig}{receptor}{$rbase}{rpath} = $vina->receptor->stringify;
 
         foreach my $center ( @{ $djob->{centers} } ) {
 
             $vina->center( V(@$center) );    # coercion needed here!!
             my $center_key = join( '_', @$center );
             if (
-                exists( $stor->{$lbase}{receptor}{$rbase}{center}{$center_key} ) )
+                exists( $stor->{$lig}{receptor}{$rbase}{center}{$center_key} ) )
             {
-                print STDERR "already docked $lbase $rbase $center_key\n";
+                print STDERR "already docked $lig $rbase $center_key\n";
                 next if ($djob->{rerun} == 0);
                 $doing_again = 1;
-                print STDERR "overwriting $lbase $rbase $center_key if BE improves\n";
-                $from_last_time = $stor->{$lbase}{receptor}{$rbase}{center}{$center_key};
+                print STDERR "overwriting $lig $rbase $center_key if BE improves\n";
+                $from_last_time = $stor->{$lig}{receptor}{$rbase}{center}{$center_key};
+                $from_last_time->{BE} = 999 unless (exists ($from_last_time->{BE}));
             }
 
             my $t1  = time;
@@ -204,38 +212,49 @@ while ( my $stor = $json->incr_parse ) {
               $doing_again = 0;
             }
 
-            $stor->{$lbase}{receptor}{$rbase}{center}{$center_key} = $results;
+            $stor->{$lig}{receptor}{$rbase}{center}{$center_key} = $results;
             #best for ligand
-            if ( $stor->{$lbase}{BEST}{BE} > $results->{BE} ) {
-                $stor->{$lbase}{BEST}{BE}       = $results->{BE};
-                $stor->{$lbase}{BEST}{COM}      = $results->{COM};
-                $stor->{$lbase}{BEST}{receptor} = $rbase;
-                $stor->{$lbase}{BEST}{center}   = $center_key;
+            $best_today = $results->{BE} if ($best_today > $results->{BE});
+            if ( $stor->{$lig}{BEST}{BE} > $results->{BE} ) {
+                $stor->{$lig}{BEST}{BE}       = $results->{BE};
+                $stor->{$lig}{BEST}{COM}      = $results->{COM};
+                $stor->{$lig}{BEST}{receptor} = $rbase;
+                $stor->{$lig}{BEST}{center}   = $center_key;
+                $stor->{$lig}{BEST}{lpath}    = $stor->{$lig}{lpath};
+                $stor->{$lig}{BEST}{rpath}    = $stor->{$lig}{receptor}{$rbase}{rpath};
             }
         }
     }
     #best overall
-    if ( $best->{BE} > $stor->{$lbase}{BEST}{BE} ) {
-         $best->{BE}       = $stor->{$lbase}{BEST}{BE};
-         $best->{COM}      = $stor->{$lbase}{BEST}{COM};
-         $best->{ligand}   = $lbase;
-         $best->{TMass}    = $stor->{$lbase}{TMass};
-         $best->{formula}  = $stor->{$lbase}{formula};
-         $best->{receptor} = $stor->{$lbase}{BEST}{receptor};
-         $best->{center}   = $stor->{$lbase}{BEST}{center};
+    if ( $stor->{BEST}{BE} > $stor->{$lig}{BEST}{BE} ) {
+         $stor->{BEST}{BE}       = $stor->{$lig}{BEST}{BE};
+         $stor->{BEST}{COM}      = $stor->{$lig}{BEST}{COM};
+         $stor->{BEST}{ligand}   = $lig;
+         $stor->{BEST}{TMass}    = $stor->{$lig}{TMass};
+         $stor->{BEST}{formula}  = $stor->{$lig}{formula};
+         $stor->{BEST}{receptor} = $stor->{$lig}{BEST}{receptor};
+         $stor->{BEST}{center}   = $stor->{$lig}{BEST}{center};
+         $stor->{BEST}{lpath}    = $stor->{$lig}{BEST}{lpath};
+         $stor->{BEST}{rpath}    = $stor->{$lig}{BEST}{rpath};
     }
-    print $fh encode_json $stor;
+    print $fh encode_json { $lig => $stor->{$lig} };
+    printf STDERR ("BEST this run for %15s = %5.1f\n", $lig, $best_today);
     #$hack->log_fn->append( encode_json $stor );
 }
 
+my $best = $stor->{BEST};
+my $out_json = path($djob->{out_json});
+$out_json->spew(encode_json $stor);
+
 my $tp2 = time;
 $best->{message}  = "results here are for the best observed overall for this set";
-$best->{total_time} = $tp2 - $tp1;
-$best->{dock_time}  = $tdock;
+$best->{total_time} = sprintf("%.3f",$tp2 - $tp1);
+$best->{dock_time}  = sprintf("%.3f",$tdock);
+$best->{scratch}    = $vina->scratch->stringify;
 
 print Dump $best;
 
-$hack->log_fn->move( $djob->{out_json} );
+$hack->log_fn->remove;
 
 sub pack_up {
 
