@@ -218,6 +218,8 @@ foreach my $lig (grep {!/BEST/} keys %{$stor}){
             if ( $stor->{$lig}{BEST}{BE} > $results->{BE} ) {
                 $stor->{$lig}{BEST}{BE}       = $results->{BE};
                 $stor->{$lig}{BEST}{COM}      = $results->{COM};
+                $stor->{$lig}{BEST}{Zxyz}     = $results->{Zxyz}     if (exists($results->{Zxyz}));
+                $stor->{$lig}{BEST}{NeighRes} = $results->{NeighRes} if (exists($results->{NeighRes}));
                 $stor->{$lig}{BEST}{receptor} = $rbase;
                 $stor->{$lig}{BEST}{center}   = $center_key;
                 $stor->{$lig}{BEST}{lpath}    = $stor->{$lig}{lpath};
@@ -229,6 +231,8 @@ foreach my $lig (grep {!/BEST/} keys %{$stor}){
     if ( $stor->{BEST}{BE} > $stor->{$lig}{BEST}{BE} ) {
          $stor->{BEST}{BE}       = $stor->{$lig}{BEST}{BE};
          $stor->{BEST}{COM}      = $stor->{$lig}{BEST}{COM};
+         $stor->{BEST}{Zxyz}     = $stor->{$lig}{BEST}{Zxyz}     if (exists($stor->{$lig}{BEST}{Zxyz})); 
+         $stor->{BEST}{NeighRes} = $stor->{$lig}{BEST}{NeighRes} if (exists($stor->{$lig}{BEST}{NeighRes})); 
          $stor->{BEST}{ligand}   = $lig;
          $stor->{BEST}{TMass}    = $stor->{$lig}{TMass};
          $stor->{BEST}{formula}  = $stor->{$lig}{formula};
@@ -247,10 +251,11 @@ my $out_json = path($djob->{out_json});
 $out_json->spew(encode_json $stor);
 
 my $tp2 = time;
-$best->{message}  = "results here are for the best observed overall for this set";
+$best->{message}    = "results here are for the best observed overall for this set";
 $best->{total_time} = sprintf("%.3f",$tp2 - $tp1);
 $best->{dock_time}  = sprintf("%.3f",$tdock);
 $best->{scratch}    = $vina->scratch->stringify;
+$best->{out_json}   = $out_json->stringify;
 
 print Dump $best;
 
