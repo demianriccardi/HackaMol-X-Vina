@@ -111,12 +111,12 @@ my $tp1         = time;
 my $tdock       = 0;
 my $yaml_config = shift or die "pass yaml configuration file";
 my $djob        = LoadFile($yaml_config);
-
 #set some default configurations
 #
 $djob->{overwrite_json} = 0          unless( exists( $djob->{overwrite_json}) );
 $djob->{out_json} = $djob->{in_json} unless( exists( $djob->{out_json}) );
 $djob->{rerun} = 0                   unless( exists( $djob->{rerun}) );
+$djob->{clean} = 1                   unless( exists( $djob->{clean}) );
 
 unless ($djob->{overwrite_json}){
   if( $djob->{out_json} eq $djob->{in_json}){
@@ -254,7 +254,13 @@ $best->{scratch}    = $vina->scratch->stringify;
 
 print Dump $best;
 
-$hack->log_fn->remove;
+if ($djob->{clean}){
+  print STDERR "removing temporary files; set \$djob->{clean} to keep\n";
+  $hack->log_fn->remove;
+  $vina->scratch->child($vina->in_fn)->remove;
+  $vina->scratch->child($vina->out_fn)->remove;
+  path($yaml_config)->remove;
+};
 
 sub pack_up {
 
