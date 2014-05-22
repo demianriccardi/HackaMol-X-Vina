@@ -3,19 +3,33 @@ recommendations:
   have three directories of data:
 
     centers/   whatever is in here, have a yaml file with a set of centers
-               corresponding to each receptor or set of receptors
-    receptors/ pdbqt files for receiving molecule generated from MGLTools
-    ligands/   sets of json files generated from big db of pdbqt files 
+               corresponding to each receptor or set of receptors. Copy and paste
+               from this yaml into the configuration file.
+               scripts: 
+                1. FTMAP scripts for processing those pdbs
+                2. center_gen.pl center_append.pl to generate summary YAML
+
+    receptors/ pdbqt files for receiving molecule of interest 
+               scripts:
+                generate using MGLTools
+
+    ligands/   sets of json files generated from big db of pdbqt files  
+               scripts: setup_ligands_sets_mce.pl
+               MGLTools for initial db of pdbqt files.  I have a ~/db directory 
+               with a couple of sets (NCI_diversityset2 and a ZINC subset).
 
   and then directories for work and analysis
     docking_NCI/
     docking_ZINC/
     etc.
   
-2. within the working directory, the first screen or dock should pull from the ligands/ 
-  databases, but write to local databases (in new scratch dirs). the next screens can
-  read and write to the same scratch directory (now also data). After accumulating docking
-  data, separate good from bad, analyze etc.
+    Within the working directory, copy the broadcast.pl script over and the example.yaml 
+    configuration file. Adjust conf file: the first screen or dock should pull from the 
+    ligands/ databases (data: path/to/ligands), but write to local databases (in new 
+    scratch dirs). the next screens can read and write to the same scratch directory (now 
+    also data). Invoking broadcast.pl will apply the configuration file across all json
+    files loaded from the data directory and invoke ligands_dock.pl.  After accumulating 
+    docking data, separate good from bad, analyze etc.
   
-     
+    see descriptions in example.yaml and ligands_dock.pl.
 
