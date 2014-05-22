@@ -14,6 +14,8 @@ $scratch->mkpath unless ($scratch->exists);
 my @jsons = $data->children(qr/\.json/);
 
 my $iend   = shift || $#jsons;
+$iend = $#jsons if ($iend>$#jsons);
+
 my $prefix = '';
 $prefix = $yaml->{prefix} if (exists($yaml->{prefix}));
 
