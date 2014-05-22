@@ -8,13 +8,14 @@ recommendations:
     ligands/   sets of json files generated from big db of pdbqt files 
 
   and then directories for work and analysis
-    forfunNCI/
-    biznesZINC/
+    docking_NCI/
+    docking_ZINC/
     etc.
   
 2. within the working directory, the first screen or dock should pull from the ligands/ 
   databases, but write to local databases (in new scratch dirs). the next screens can
-  read and write to the same scratch directory (now also data).
+  read and write to the same scratch directory (now also data). After accumulating docking
+  data, separate good from bad, analyze etc.
   
      
 

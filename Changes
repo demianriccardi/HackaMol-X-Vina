@@ -1,6 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+    * Examples have been significantly improved
 
 0.00_7    2014-05-16 12:54:54EDT-0400 America/New_York
     * More POD changes
