@@ -17,9 +17,8 @@ my $dockem = HackaMol->new(
 );
 $dockem->scratch->mkpath unless ( $dockem->scratch->exists );
 
-# split up all the ligands into sets with 100 ligands per set
+# split up all the ligands into sets with 10 ligands per set
 my $nligsper = 10;
-#my $nligsper = 100;
 
 my @jobs = split_by( $nligsper, $dockem->data->children( qr/\.pdbqt/ ) );
 
