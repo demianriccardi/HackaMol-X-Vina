@@ -62,7 +62,7 @@ control of what is written into files that can quickly accumulate. For example, 
 receptor for a collection of centers located at the hydroxy group of tyrosine residues; there are a multitude of binding
 site prediction software that can be used to provide a collection of centers. Loops over ligands, receptors, centers are 
 straightforward to implement, but large screens on a computer cluster will require splitting the loops into chunks that
-can be spread across the queueing system.  Examples will follow.
+can be spread across the queueing system.  See examples.
 
 This class does not include the AutoDock Vina program, which is 
 [released under a very permissive Apache license](http://vina.scripps.edu/manual.html#license), with few 

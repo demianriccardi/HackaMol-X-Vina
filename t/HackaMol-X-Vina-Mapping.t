@@ -9,8 +9,10 @@ use HackaMol;
 use Math::Vector::Real;
 use Path::Tiny;
 
+my $exe = $ENV{"HOME"}."/bin/vina";
+
 SKIP: {
-    skip "vina exe not in ~/bin" unless ( -e '~/bin/vina' );
+    skip "vina exe not in ~/bin", 18 unless ( -e $exe );
 
     my $receptor = path('t/lib/receptor.pdbqt');
     my $lig1     = path('t/lib/lig.pdbqt');
@@ -30,7 +32,7 @@ SKIP: {
         cpu            => 1,
         num_modes      => 2,
         exhaustiveness => 1,
-        exe            => '~/bin/vina',
+        exe            => $exe,
         scratch        => 't/tmp',
         seed           => 314159,
     );
