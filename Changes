@@ -1,7 +1,13 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+0.00_9    2014-05-30 23:09:02-04:00 America/New_York
+    * update dependencies to fix testers 
+
+0.00_8    2014-05-30 08:38:04-04:00 America/New_York
     * Examples have been significantly improved
+    * Tests skipped if vina not in ~/bin.. todo improve further
 
 0.00_7    2014-05-16 12:54:54EDT-0400 America/New_York
     * More POD changes
