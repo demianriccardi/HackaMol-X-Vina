@@ -1,6 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+    * improved binding site script example using kmeans clustering
 
 0.00_9    2014-05-30 23:09:02-04:00 America/New_York
     * update dependencies to fix testers 
