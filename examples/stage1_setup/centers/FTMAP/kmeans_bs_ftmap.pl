@@ -45,15 +45,15 @@ foreach my $fh (map{FileHandle->new("< $_")} @files){
 }
 
 
-my $t = Math::Vector::Real::kdTree->new(@ftmap);
+my $tree = Math::Vector::Real::kdTree->new(@ftmap);
 
 my @means;
 my @dist;
 my $ki = 20;
 
 while ($ki){
-  @means = $t->k_means_start($ki);
-  @means = $t->k_means_loop(@means);
+  @means = $tree->k_means_start($ki);
+  @means = $tree->k_means_loop(@means);
   my @ineigh = Math::Vector::Real::Neighbors->neighbors(@means);
   @dist = map {$means[$_]->dist($means[$ineigh[$_]]) } 0 .. $#ineigh;
   if (grep {$_ < $rcut} @dist){
