@@ -1,3 +1,5 @@
+deprecated examples; keeping for reference.  Use kmeans_bs_ftmap.pl 
+
 Objective: you've run FTMap on a bunch (>1) of configurations of a molecule 
            that had been aligned beforehand.  You wish to collect up all 
            the small molecules bound via FTMap's ugly PDBs and reduce them 
