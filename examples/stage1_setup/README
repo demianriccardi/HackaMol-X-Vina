@@ -2,34 +2,42 @@ recommendations:
 1. in a working directory:
   have three directories of data:
 
-    centers/   whatever is in here, have a yaml file with a set of centers
-               corresponding to each receptor or set of receptors. Copy and paste
-               from this yaml into the configuration file.
-               scripts: 
-                1. FTMAP scripts for processing those pdbs
-                2. center_gen.pl center_append.pl to generate summary YAML
+    centers/   In Autodock Vina, a center localizes a search area (box) that hopefully contains
+               a binding site.  You can cook up your own algorithms for finding binding sites, or
+               there are many methods available online (I have been using ftmap.bu.edu). Regardless
+               of the approach, construct a summarizing yaml file that pairs receptors with centers. 
+               Yaml is easy to read and edit by human or script. Copy and paste
+               from this yaml into the docking configuration file used for screens.
+               
+                1. There is a simple FTMAP scripts for processing those pdbs using kmeans clustering from
+                   Math::Vector::Real::kdTree.  This script dumps an XYZ file of search centers (with Hg atoms).
+                2. center_gen.pl center_append.pl can be used to generate summary YAML.
 
     receptors/ pdbqt files for receiving molecule of interest 
                scripts:
-                generate using MGLTools
+               generate using MGLTools. 
 
     ligands/   sets of json files generated from big db of pdbqt files  
-               scripts: setup_ligands_sets_mce.pl
-               MGLTools for initial db of pdbqt files.  I have a ~/db directory 
-               with a couple of sets (NCI_diversityset2 and a ZINC subset).
+               scripts: setup_ligands_sets_mce.pl 
+                   will pull all the pdbqts and put them into subsets of json files
+                   with some additional information.
+                
+               I used OpenBabel and MGLTools for my setup of the db of pdbqt files.  e.g. I have a ~/db directory 
+               with a couple of sets (NCI_diversityset2 and a ZINC subset) that are too big to share.
 
-  and then directories for work and analysis
+  and then the "scratch" directories for work and analysis
     docking_NCI/
     docking_ZINC/
     etc.
   
-    Within the working directory, copy the broadcast.pl script over and the example.yaml 
-    configuration file. Adjust conf file: the first screen or dock should pull from the 
-    ligands/ databases (data: path/to/ligands), but write to local databases (in new 
-    scratch dirs). the next screens can read and write to the same scratch directory (now 
-    also data). Invoking broadcast.pl will apply the configuration file across all json
-    files loaded from the data directory and invoke ligands_dock.pl.  After accumulating 
-    docking data, separate good from bad, analyze etc.
+    Within these working directories, copy the broadcast.pl script over and the example.yaml 
+    configuration file. Adjust configuration file and do some tests to make sure everything is
+    working.  When ready, you are entering stage 2. Briefly, the first screen or dock should pull 
+    from the ligands/ directory containing the json subset databases, but all writing should point 
+    to a directory of dbs in the working directory.  [This allows work to be carried out more cleanly 
+    in parallel.  You can  write to the ligands/ directory, but it could get tangled up if many 
+    different approaches are taken.] In each additional screen (say new receptor and or center), 
+    reading and writing from the same working directory database seems to work well. 
   
     see descriptions in example.yaml and ligands_dock.pl.
 
