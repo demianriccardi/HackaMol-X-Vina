@@ -1,4 +1,10 @@
 #!/usr/bin/env perl
+# Demian Riccardi, June 6, 2014
+#
+# Store the json databases by ligand
+# see setup_receptors_sets_mce.pl to store by ligand 
+#
+# pull down some pdbs:
 # wget http://autodock.scripps.edu/local_files/screening/NCI-Diversity-AutoDock-0.2.tar.gz
 # use MCE to set up the subsets faster
 use Modern::Perl;
@@ -12,8 +18,8 @@ use Array::Split qw(split_by);
 my $t1 = time;
 my $dockem = HackaMol->new(
     hush_read => 1,
-    data      => 'NCI_diversitySet2/pdbqt',
-    scratch   => "some/different/path/ligands/NCI_diversitySet2",
+    data      => 'pdbqts',
+    scratch   => 'dbs'
 );
 $dockem->scratch->mkpath unless ( $dockem->scratch->exists );
 
