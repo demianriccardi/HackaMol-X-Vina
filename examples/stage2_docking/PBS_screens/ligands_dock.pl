@@ -93,10 +93,6 @@
 #     {liga=>{}, ligb=>{}, ...} but be careful if merging with data rich json files (so you don't 
 #     lose data)... i.e. backup.
 #
-#   scripts todo: merge_docks.pl for combining results safely.
-#
-#   See dock_these.pl for screening ligands/centers/receptors
-#
 use Modern::Perl;
 use HackaMol;
 use HackaMol::X::Vina;

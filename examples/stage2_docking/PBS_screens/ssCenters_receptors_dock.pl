@@ -7,78 +7,21 @@
 # INPUT:
 #   this script reads in a YAML configuration file passed on commandline:
 #   $yaml->{in_json} is the path to the json file containing independent data
-#   for each ligand. The first run, there will be no docking information present.
-#   The json file will contain the ligand information (TMass, formula, BEST => {BE = 0},
+#   for each receptor. The first run, there will be no docking information present.
+#   The json file will contain the receptor information (TMass(kD), formula, BEST => {BE = 0},
 #   etc. ). This script iterates (see JSON::XS on metacpan) through this json loaded by 
-#   ligand and running the centers and receptors from the YAML configuration file.  
+#   receptor and running the ligands from the YAML configuration file. The centers are   
+#   determined on the fly!  the script below uses disulfid bonds, which was relevant for the 
+#   HackaMol paper.
 #
 #   You are encouraged load the json file and then dump it with YAML early and often
 #   to get oriented with the datastructure.
 #
-#   The set of centers are assumed to correspond to the set of receptors! 
-#   e.g. two receptors with very different coordinates (translation) should have two
-#        different sets of centers.
-#
 #   The num_modes will always be 1 for screens; i don't see the point (yet) of additional 
 #   configs for virtual screens.  Need a different script to run with num_modes>1 
 #==============================================================================
-#   Example config.yaml
+# INPUT:  see receptors_example.yaml
 #==============================================================================
-# ---
-# name: set_0
-# out: set_0.pdbqt
-# in: conf_0.txt
-# cpu: 4
-# exhaustiveness: 12
-# size:
-# - 20
-# - 20
-# - 20
-# rerun: 0
-# overwrite_json: 1
-# be_cutoff: -8.0
-# dist_cutoff: 4.0
-# scratch:  runs/ZINC_drugs_now_80
-# in_json:  runs/ZINC_drugs_now_80/set_000.json
-# out_json: runs/ZINC_drugs_now_80/set_000.json
-# receptors:
-# - /home/some/path/receptors/rec1.pdbqt
-# - /home/some/path/receptors/rec2.pdbqt
-# - /home/some/path/receptors/rec3.pdbqt
-# - /home/some/path/receptors/rec4.pdbqt
-# centers:
-# - - [ -10.95, 6.375, 3.2]
-# - - 14.4
-#   - -5.4
-#   - 4.1
-#
-#==============================================================================
-#   you can edit by hand! you can write it out with whatever scripting language you
-#   are confortable with (ruby, python, perl all have yaml reading capabilities). In
-#   perl, it's hashes and arrays.
-#
-#   name           => not used here, this used for pbs submission script.. 
-#                     (-> pbs output for STDERR and STDOUT $name.o1790983 $name.e1790983)  
-#   in             => name of the local config file that vina will load. 
-#   out            => name of the local file that vina will dump configuration to. 
-#                     This file is loaded and some info saved if be_cutoff satisfied.
-#   rerun          => 0,1 will rerun if receptor and center keys already present (save if BE improves)
-#   overwrite_json => 0,1 will die if trying to write to json file that exists
-#   cpu            => integer, vina param number of cpus used in calculation 
-#                     (converted to ppn for PBS submission)
-#   exhaustiveness => integer, vina param how hard to search 
-#   size           => how big of a box to use
-#   be_cutoff      => number ("kcal/mol" vina), if BE < be_cutoff, store more info
-#   dist_cutoff    => number (angstroms), if distance(atom_rec atom_lig) < dist_cutoff bin the 
-#                     recepter residue, stored under NeighRes => {} 
-#   scratch        => directory (arbitrary path) where the work is carried out 
-#                     (may be in the same or different directory as json file)
-#   in_json        => json containing hash keyed by ligands to run docking
-#   out_json       => json file to write result from docking into same datastructure as in_json
-#   receptors      => array_ref [receptors to dock the ligands into at the centers]
-#   centers        => array_ref of array_ref [ [x1,y1,z1], [x2,y2,z2] ]
-#
-#   This script will die unless the JSON file exists!
 #
 # OUTPUT:
 #   STDERR: some carping if ligands are ignored or results overwritten
@@ -92,10 +35,6 @@
 #     file to the out_json file, you have to convert something like {liga}{ligb}{ligc}{ligd} to 
 #     {liga=>{}, ligb=>{}, ...} but be careful if merging with data rich json files (so you don't 
 #     lose data)... i.e. backup.
-#
-#   scripts todo: merge_docks.pl for combining results safely.
-#
-#   See dock_these.pl for screening ligands/centers/receptors
 #
 use Modern::Perl;
 use HackaMol;
