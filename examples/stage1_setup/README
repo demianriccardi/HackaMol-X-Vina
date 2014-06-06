@@ -39,5 +39,21 @@ recommendations:
     different approaches are taken.] In each additional screen (say new receptor and or center), 
     reading and writing from the same working directory database seems to work well. 
   
-    see descriptions in example.yaml and ligands_dock.pl.
+    see descriptions in ligands_example.yaml and ligands_dock.pl.
+    see descriptions in receptors_example.yaml and receptors_dock.pl.
+
+
+  screening thousands of ligands with few receptors vs screening thousands of receptors and few ligands
+  have unique sets of scripts.. bleh. Clearly, a generalized class for VS that knows how to do both would
+  be useful.
+
+  
+
+ 
+
+
+
+
+
+
 

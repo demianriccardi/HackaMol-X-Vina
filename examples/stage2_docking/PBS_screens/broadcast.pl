@@ -21,6 +21,9 @@ $prefix = $yaml->{prefix} if (exists($yaml->{prefix}));
 
 foreach my $json ( (sort @jsons)[$istart .. $iend] ){
 
+  if ($prefix =~ /./){
+    die "prefix matches what is already there" if ($json->basename =~ m/$prefix/);
+  }
   $yaml->{name}     = $prefix . $json->basename(qr/\.json/); 
   $yaml->{out}      = $yaml->{name} . ".pdbqt";
   $yaml->{in}       = $yaml->{name} . ".txt";
