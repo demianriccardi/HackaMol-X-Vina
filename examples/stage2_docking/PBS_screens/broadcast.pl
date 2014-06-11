@@ -53,7 +53,7 @@ foreach my $json ( (sort @jsons)[$istart .. $iend] ){
 
 sub name_in_queue {
   my $name = shift;
-  my ($jobline) = grep {m/$name/} 
+  my ($jobline) = grep {m/\s+$name/} 
                   grep {! m/\d\sC\s/}  `qstat`; # avoid those pbs lagging jobs
   return 0 unless (defined($jobline));
   my ($jobid) = split(' ', $jobline);  

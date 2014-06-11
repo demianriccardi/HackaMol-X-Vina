@@ -252,6 +252,7 @@ $best->{total_time} = sprintf("%.3f",$tp2 - $tp1);
 $best->{dock_time}  = sprintf("%.3f",$tdock);
 $best->{scratch}    = $vina->scratch->stringify;
 $best->{out_json}   = $out_json->stringify;
+$best->{job_configuration} = $djob;
 
 print Dump $best;
 
