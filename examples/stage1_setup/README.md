@@ -5,7 +5,7 @@ receptors.  For the situation where you have a large number of receptors compare
 screening a single molecule against many possible target biological molecules, see HackaMol-CaseStudy) you can 
 switch the descriptions below for the receptor and ligand directories.
 
-Stage 1. in a working directory have three directories:
+Stage 1. in a main working directory have three directories:
   
     receptors/ contains the pdbqt files for receiving molecule of interest. After some initial prepping 
                (strip hydrogens, etc) I generate them using MGLTools, which free and easy to install. 
