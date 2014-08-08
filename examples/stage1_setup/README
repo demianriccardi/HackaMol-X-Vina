@@ -1,7 +1,9 @@
-Recommendations for setting up Autodock Vina screens:
+Recommendations for setting up Autodock Vina screens with a large number of ligands compared to the number of 
+receptors.  For the situation where you have a large number of receptors compared to the number of ligands (say
+screening a single molecule against many possible target biological molecules, see HackaMol-CaseStudy) you can 
+switch the descriptions below for the receptor and ligand directories.
 
-1. in a working directory:
-  have three directories, one for centers:
+Stage 1. in a working directory have three directories:
   
     receptors/ contains the pdbqt files for receiving molecule of interest. After some initial prepping 
                (strip hydrogens, etc) I generate them using MGLTools, which free and easy to install. 
@@ -29,36 +31,34 @@ Recommendations for setting up Autodock Vina screens:
                    centers (with Hg atoms).
                 2. center_gen.pl center_append.pl can be used to generate summary YAML.
 
-    ligands/   sets of json files generated from big db of pdbqt files  
+    ligands/   sets of json files that contain subsets of a big database of ligand pdbqt files.  
                scripts: setup_ligands_sets_mce.pl 
-                   will pull all the pdbqts and put them into subsets of json files
-                   with some additional information.
+                   will pull all the pdbqts and file them into subsets of json files with some additional information.
                 
                I used OpenBabel and MGLTools for my setup of the db of pdbqt files.  e.g. I have a ~/db directory 
                with a couple of sets (NCI_diversityset2 and a ZINC subset) that are too big to share.
 
-  and then the "scratch" directories for work and analysis
+   Setting up Stage 2. next creat the "scratch" directories for work and analyses
     docking_NCI/
     docking_ZINC/
     etc.
   
     Within these working directories, copy the broadcast.pl script over and the example.yaml 
     configuration file. Adjust configuration file and do some tests to make sure everything is
-    working.  When ready, you are entering stage 2. Briefly, the first screen or dock should pull 
-    from the ligands/ directory containing the json subset databases, but all writing should point 
-    to a directory of dbs in the working directory.  [This allows work to be carried out more cleanly 
-    in parallel.  You can  write to the ligands/ directory, but it could get tangled up if many 
-    different approaches are taken.] In each additional screen (say new receptor and or center), 
-    reading and writing from the same working directory database seems to work well. 
+    working.  You are now entering stage 2. 
+    
+Stage 2. Briefly, THE FIRST SCREEN should pull from the ligands/ directory above, do some docking, and then write 
+    to a directory of dbs in the working directory.  You have to set this in the configuration YAML file.  You can write
+    back to the original json subsets, but this gets very annoyting if you want to run different screens in parallel.
+    FOR EACH FOLLOWING SCREEN,(say new receptor and or center), reading and writing from the same working directory 
+    json subsets seems to work pretty well.  There may be a need to merge json files, which isn't too difficult. 
   
     see descriptions in ligands_example.yaml and ligands_dock.pl.
     see descriptions in receptors_example.yaml and receptors_dock.pl.
 
 
-  screening thousands of ligands with few receptors vs screening thousands of receptors and few ligands
-  have unique sets of scripts.. bleh. Clearly, a generalized class for VS that knows how to do both would
-  be useful.
-
+In the future, I would like to creat a generalized class for virtual screens that is 1. agnostic to the docking method
+and 2. knows how to deal with both situations (many more ligands than receptors vs many more receptors than ligands).
   
 
  
