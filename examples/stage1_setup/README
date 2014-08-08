@@ -56,6 +56,7 @@ Stage 2. Briefly, THE FIRST SCREEN should pull from the ligands/ directory above
     see descriptions in ligands_example.yaml and ligands_dock.pl.
     see descriptions in receptors_example.yaml and receptors_dock.pl.
 
+Stage 3. Analysis!  Updates to follow.
 
 In the future, I would like to creat a generalized class for virtual screens that is 1. agnostic to the docking method
 and 2. knows how to deal with both situations (many more ligands than receptors vs many more receptors than ligands).
