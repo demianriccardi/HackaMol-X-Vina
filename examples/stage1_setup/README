@@ -1,21 +1,33 @@
-recommendations:
-1. in a working directory:
-  have three directories of data:
+Recommendations for setting up Autodock Vina screens:
 
-    centers/   In Autodock Vina, a center localizes a search area (box) that hopefully contains
-               a binding site.  You can cook up your own algorithms for finding binding sites, or
-               there are many methods available online (I have been using ftmap.bu.edu). Regardless
-               of the approach, construct a summarizing yaml file that pairs receptors with centers. 
-               Yaml is easy to read and edit by human or script. Copy and paste
+1. in a working directory:
+  have three directories, one for centers:
+  
+    receptors/ contains the pdbqt files for receiving molecule of interest. After some initial prepping 
+               (strip hydrogens, etc) I generate them using MGLTools, which free and easy to install. 
+               Please see:
+               https://github.com/demianriccardi/HackaMol-CaseStudy/tree/master/Vina_disulfide
+
+    centers/   In Autodock Vina, a center localizes a search area (x,y,z dimensional box) that 
+               may or may not contain a reasonable binding site (depends on your educated guess). In the 
+               HackaMol-CaseStudy, which is part of a paper that is in review, I use the centers of disulfide
+               bonds in a collection of X-ray crystal structures to screen the ligands cystine and glutathione 
+               disulfide. For this the centers are determined on the fly by a disulfide search. You can 
+               cook up your own algorithms for finding reasonable binding sites, or you can use one of the 
+               many methods available online (I have been using ftmap.bu.edu for more conventional screens). 
+               There are also a ton of awesome tools at the Yang Zhang lab at the University of Michigan 
+               (They use some Perl too!!!): http://zhanglab.ccmb.med.umich.edu
+               
+               Whatever approach is used, if it takes a long time, you should store the centers for future use 
+               in this directory. I construct a yaml file of a hash with centers stored for each receptor for 
+               easy reference. Yaml is easy to read and edit by human or script. Copy and paste
                from this yaml into the docking configuration file used for screens.
                
-                1. There is a simple FTMAP scripts for processing those pdbs using kmeans clustering from
-                   Math::Vector::Real::kdTree.  This script dumps an XYZ file of search centers (with Hg atoms).
+               If using FTMap, I have included some scripts:
+                1. A simple scripts for processing FTMAP pdbs using kmeans clustering provided by 
+                   from Math::Vector::Real::kdTree (THANK YOU SALVA).  This script dumps an XYZ file of search 
+                   centers (with Hg atoms).
                 2. center_gen.pl center_append.pl can be used to generate summary YAML.
-
-    receptors/ pdbqt files for receiving molecule of interest 
-               scripts:
-               generate using MGLTools. 
 
     ligands/   sets of json files generated from big db of pdbqt files  
                scripts: setup_ligands_sets_mce.pl 
