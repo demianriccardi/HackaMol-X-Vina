@@ -40,7 +40,7 @@ Stage 1. in a main working directory have three directories:
                I used OpenBabel and MGLTools for my setup of the db of pdbqt files.  e.g. I have a ~/db directory 
                with a couple of sets (NCI_diversityset2 and a ZINC subset) that are too big to share.
 
-   Setting up Stage 2. next creat the "scratch" directories for work and analyses
+   Setting up Stage 2. next create the "scratch" directories for work and analyses
     docking_NCI/
     docking_ZINC/
     etc.
