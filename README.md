@@ -4,10 +4,9 @@ HackaMol extension for running Autodock Vina
 
 VERSION
 ========
-developer version 0.00_9 
-Available for testing from cpan.org:
+developer version 0.01 
 
-please see *[HackaMol::X::Vina on MetaCPAN](https://metacpan.org/release/DEMIAN/HackaMol-X-Vina-0.00_9) for formatted documentation.
+please see *[HackaMol::X::Vina on MetaCPAN](https://metacpan.org/release/DEMIAN/HackaMol-X-Vina-0.01) for formatted documentation.
 
 SYNOPSIS
 ============
