@@ -34,7 +34,7 @@ my $cwd = getcwd;
                         dock dock_mol
                        );
 
-    my @roles = qw(HackaMol::ExeRole HackaMol::PathRole);
+    my @roles = qw(HackaMol::Roles::ExeRole HackaMol::Roles::PathRole);
 
     map has_attribute_ok( 'HackaMol::X::Vina', $_ ), @attributes;
     map can_ok( 'HackaMol::X::Vina', $_ ), @methods;
