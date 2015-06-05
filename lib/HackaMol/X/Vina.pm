@@ -11,7 +11,7 @@ use File::chdir;
 use namespace::autoclean;
 use Carp;
 
-with qw(HackaMol::X::ExtensionRole);
+with qw(HackaMol::X::Roles::ExtensionRole);
 
 has $_ => ( 
             is        => 'rw', 
@@ -256,11 +256,11 @@ This method takes no arguments; it returns, as a scalar, the input constructed f
 
 =method map_input
 
-provided by L<HackaMol::X::ExtensionRole>. Writes the configuration file for Vina. See dock and dock_mol methods.
+provided by L<HackaMol::X::Roles::ExtensionRole>. Writes the configuration file for Vina. See dock and dock_mol methods.
 
 =method map_output
 
-provided by L<HackaMol::X::ExtensionRole>. By default, this method returns the docking scores as an array.
+provided by L<HackaMol::X::Roles::ExtensionRole>. By default, this method returns the docking scores as an array.
 
 =method dock_mol
 
@@ -272,11 +272,11 @@ this method is similar to dock_mol, but returns only the scores.
 
 =attr mol 
 
-isa L<HackaMol::Molecule> object that is 'ro' and provided by L<HackaMol::X::ExtensionRole>.  
+isa L<HackaMol::Molecule> object that is 'ro' and provided by L<HackaMol::X::Roles::ExtensionRole>.  
 
 =attr map_in map_out 
 
-these attributes are 'ro' CodeRefs that can be adjusted in a given instance of a class. These are provided by L<HackaMol::X::ExtensionRole>.  Setting the map_in and map_out attributes are for advanced use.  Defaults are provided that are used in the map_input and map_output methods.
+these attributes are 'ro' CodeRefs that can be adjusted in a given instance of a class. These are provided by L<HackaMol::X::Roles::ExtensionRole>.  Setting the map_in and map_out attributes are for advanced use.  Defaults are provided that are used in the map_input and map_output methods.
 
 =attr receptor ligand 
 
@@ -350,7 +350,7 @@ described above.
 
 =for :list
 * L<HackaMol>
-* L<HackaMol::X::ExtensionRole>
+* L<HackaMol::X::Roles::ExtensionRole>
 * L<HackaMol::X::Calculator>
 * L<PBS::Client>
 * L<Vina | http://vina.scripps.edu>

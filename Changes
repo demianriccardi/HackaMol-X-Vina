@@ -1,6 +1,9 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+    * use reorganized extension roles
+
+0.01      2015-04-15 16:06:35-04:00 America/Indiana/Indianapolis
     * improved binding site script example using kmeans clustering
     * more examples for receptor based and ligand based screens
 
