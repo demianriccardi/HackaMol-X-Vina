@@ -10,6 +10,7 @@ please see *[HackaMol::X::Vina on MetaCPAN](https://metacpan.org/release/DEMIAN/
 
 SYNOPSIS
 ============
+```perl
          use Modern::Perl;
          use HackaMol;
          use HackaMol::X::Vina;
@@ -48,6 +49,7 @@ SYNOPSIS
 
            $_->segid("hgca") foreach $rmol->all_atoms; #for vmd rendering cartoons.. etc
            $rmol->print_pdb("receptor.pdb");
+```
 
 DESCRIPTION
 ============
