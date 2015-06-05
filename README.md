@@ -10,6 +10,7 @@ please see *[HackaMol::X::Vina on MetaCPAN](https://metacpan.org/release/DEMIAN/
 
 SYNOPSIS
 ============
+```perl
          use Modern::Perl;
          use HackaMol;
          use HackaMol::X::Vina;
@@ -48,6 +49,7 @@ SYNOPSIS
 
            $_->segid("hgca") foreach $rmol->all_atoms; #for vmd rendering cartoons.. etc
            $rmol->print_pdb("receptor.pdb");
+```
 
 DESCRIPTION
 ============
@@ -74,6 +76,4 @@ optimization and multithreading, Journal of Computational Chemistry 31 (2010) 45
 
 Since HackaMol has no pdbqt writing capabilities (yet, HackaMol can read pdbqt files), the user is required to provide
 those  files. [OpenBabel] (http://openbabel.org/wiki/Main_Page) and [MGLTools] (http://mgltools.scripps.edu) are popular
-and effective. This is still a work in progress and the API may change. Documentation will improve as API
-gets more stable... comments/contributions welcome!  The automated testing reported on metacpan will likely give a bunch 
-of fails until I have time to figure out how to skip tests calling on the vina program to run.  
+and effective. 
