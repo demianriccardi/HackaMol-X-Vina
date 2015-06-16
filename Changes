@@ -1,6 +1,9 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+    * add prereq for installs
+
+0.011     2015-06-05 10:42:18-04:00 America/Indiana/Indianapolis
     * use reorganized extension roles
 
 0.01      2015-04-15 16:06:35-04:00 America/Indiana/Indianapolis
