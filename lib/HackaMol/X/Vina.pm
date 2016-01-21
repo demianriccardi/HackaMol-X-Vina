@@ -5,28 +5,27 @@ use Moose;
 use MooseX::StrictConstructor;
 use Moose::Util::TypeConstraints;
 use Math::Vector::Real;
-use MooseX::Types::Path::Tiny qw(AbsPath) ;
-use HackaMol; # for building molecules
+use MooseX::Types::Path::Tiny qw(AbsPath);
+use HackaMol;    # for building molecules
 use File::chdir;
 use namespace::autoclean;
 use Carp;
 
 with qw(HackaMol::X::Roles::ExtensionRole);
 
-has $_ => ( 
-            is        => 'rw', 
-            isa       => AbsPath, 
-            predicate => "has_$_",
-            required  => 1,
-            coerce    => 1,
-          ) foreach ( qw( receptor ligand ) );
+has $_ => (
+    is        => 'rw',
+    isa       => AbsPath,
+    predicate => "has_$_",
+    required  => 1,
+    coerce    => 1,
+) foreach (qw( receptor ligand ));
 
 has 'save_mol' => (
-            is      => 'rw',
-            isa     => 'Bool',
-            default => 0,
-);        
-   
+    is      => 'rw',
+    isa     => 'Bool',
+    default => 0,
+);
 
 has $_ => (
     is        => 'rw',
@@ -47,7 +46,6 @@ has $_ => (
     isa       => 'Int',
     predicate => "has_$_",
 ) foreach qw(energy_range exhaustiveness seed cpu);
-
 
 has 'center' => (
     is        => 'rw',
@@ -71,13 +69,13 @@ sub BUILD {
     }
 
     # build in some defaults
-    $self->in_fn("conf.txt") unless ($self->has_in_fn);
-    $self->exe($ENV{"HOME"}."/bin/vina") unless $self->has_exe;
+    $self->in_fn("conf.txt") unless ( $self->has_in_fn );
+    $self->exe( $ENV{"HOME"} . "/bin/vina" ) unless $self->has_exe;
 
     unless ( $self->has_out_fn ) {
-      my $outlig = $self->ligand->basename;
-      $outlig =~ s/\.pdbqt/\_out\.pdbqt/;
-      $self->out_fn($outlig); 
+        my $outlig = $self->ligand->basename;
+        $outlig =~ s/\.pdbqt/\_out\.pdbqt/;
+        $self->out_fn($outlig);
     }
 
     unless ( $self->has_command ) {
@@ -114,11 +112,13 @@ sub build_command {
 }
 
 sub _build_map_in {
+
     # this builds the default behavior, can be set anew via new
     return sub { return ( shift->write_input ) };
 }
 
 sub _build_map_out {
+
     # this builds the default behavior, can be set anew via new
     my $sub_cr = sub {
         my $self = shift;
@@ -133,25 +133,27 @@ sub _build_map_out {
 }
 
 sub dock {
-  my $self      = shift;
-  my $num_modes = shift;
-  $self->num_modes($num_modes) if defined($num_modes);
-  $self->map_input;
-  return $self->map_output;
+    my $self      = shift;
+    my $num_modes = shift;
+    $self->num_modes($num_modes) if defined($num_modes);
+    $self->map_input;
+    return $self->map_output;
 }
 
 sub dock_mol {
-  # want this to return configurations of the molecule
-  my $self      = shift;
-  my $num_modes = shift;
-  $self->num_modes($num_modes) if defined($num_modes);
-  $self->map_input; 
-  local $CWD = $self->scratch if ( $self->has_scratch );
-  my @bes = $self->map_output; # this is fragile... broken if map_out changed...
-  my $mol = HackaMol -> new(hush_read => 1)
-                     -> read_file_mol($self->out_fn->stringify);
-  $mol->push_score(@bes);
-  return ($mol);
+
+    # want this to return configurations of the molecule
+    my $self      = shift;
+    my $num_modes = shift;
+    $self->num_modes($num_modes) if defined($num_modes);
+    $self->map_input;
+    local $CWD = $self->scratch if ( $self->has_scratch );
+    my @bes =
+      $self->map_output;    # this is fragile... broken if map_out changed...
+    my $mol = HackaMol->new( hush_read => 1 )
+      ->read_file_mol( $self->out_fn->stringify );
+    $mol->push_score(@bes);
+    return ($mol);
 }
 
 sub write_input {
